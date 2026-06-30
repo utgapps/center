@@ -411,14 +411,14 @@
   }
   function updateStatus() {
     const el = $("statusBar");
-    if (el) el.textContent = `🖼️ ${state.canvasW}×${state.canvasH} picture · ▦ ${state.w}×${state.h} tiles (${state.tile}px each)`;
+    if (el) el.textContent = `🖼️ ${state.canvasW}×${state.canvasH} picture · ▦ ${state.tile}px pixels · ${state.w}×${state.h} grid`;
   }
 
   // ============================================================
   //  Export
   // ============================================================
   function openExport() {
-    $("gridInfo").textContent = `${state.w} × ${state.h} tiles on a ${state.canvasW} × ${state.canvasH} picture`;
+    $("gridInfo").textContent = `${state.w} × ${state.h} pixels (each ${state.tile}px) on a ${state.canvasW} × ${state.canvasH} picture`;
     $("exportW").value = state.exportW;
     $("exportH").value = state.exportH;
     $("exportModal").classList.remove("hidden");
@@ -497,7 +497,7 @@
     const canvas = num("canvas") ?? num("size");
     const cw = num("cw") ?? canvas;
     const ch = num("ch") ?? canvas;
-    const tile = num("tile");
+    const tile = num("tile") ?? num("px") ?? num("pixelsize");
     let ew = num("ew"), eh = num("eh");
     const exp = num("export");
     if (exp != null) { ew = ew ?? exp; eh = eh ?? exp; }
@@ -516,7 +516,7 @@
   }
   function updateWelcomeHint() {
     const g = welcomeGrid();
-    $("welcomeHint").textContent = `That gives you a ${g.w} × ${g.h} grid of tiles to color.`;
+    $("welcomeHint").textContent = `That gives you a ${g.w} × ${g.h} grid of pixels to color.`;
   }
 
   function bind() {
