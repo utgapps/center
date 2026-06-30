@@ -213,12 +213,16 @@ html, body {
   box-shadow: var(--shadow-sm);
 }
 .canvas-wrap {
+  position: relative;
+  z-index: 1;
   background: var(--surface);
   padding: 10px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   line-height: 0;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  transform-origin: center;
 }
 #canvas {
   image-rendering: pixelated;
@@ -226,6 +230,25 @@ html, body {
   touch-action: none;
   cursor: crosshair;
   border-radius: 4px;
+}
+
+/* Press-and-hold "Preview": a to-scale 1280×720 game window behind the art */
+.game-frame {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 0; opacity: 0; pointer-events: none;
+  border: 2px solid var(--brand); border-radius: 5px;
+  background:
+    repeating-linear-gradient(45deg, rgba(1,174,253,.05) 0 12px, rgba(1,174,253,.10) 12px 24px);
+  box-shadow: 0 8px 30px rgba(1,174,253,.18);
+  transition: opacity .3s ease;
+}
+.canvas-area.previewing .game-frame { opacity: 1; }
+.canvas-area.previewing #canvas { cursor: default; pointer-events: none; }
+.game-frame-label {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--brand-ink);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 2px 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .current-color-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }

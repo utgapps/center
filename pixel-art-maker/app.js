@@ -417,6 +417,35 @@
   }
 
   // ============================================================
+  //  Game-scale preview (press & hold) — show the art inside a to-scale
+  //  1280×720 PixelPad game window, then zoom back to fill the viewport.
+  // ============================================================
+  const GAME_W = 1280, GAME_H = 720;
+  let previewing = false;
+  function enterPreview() {
+    if (previewing || editor.classList.contains("hidden")) return;
+    previewing = true;
+    const area = document.querySelector(".canvas-area");
+    const availW = Math.max(40, area.clientWidth - 56);
+    const availH = Math.max(40, area.clientHeight - 72);
+    const s = Math.min(availW / GAME_W, availH / GAME_H);   // viewport px per game px
+    const frame = $("gameFrame");
+    frame.style.width = (GAME_W * s) + "px";
+    frame.style.height = (GAME_H * s) + "px";
+    // scale the art so it shows at its true size inside the game window
+    const shown = state.w * state.pixelSize;                // current art display width
+    const factor = shown > 0 ? (state.canvasW * s) / shown : 1;
+    $("canvasWrap").style.transform = `scale(${factor})`;
+    area.classList.add("previewing");
+  }
+  function exitPreview() {
+    if (!previewing) return;
+    previewing = false;
+    $("canvasWrap").style.transform = "";
+    document.querySelector(".canvas-area").classList.remove("previewing");
+  }
+
+  // ============================================================
   //  Canvas (picture) size — keeps pixel size, recomputes the grid.
   //  The saved-picture (export) size follows the new picture size.
   // ============================================================
@@ -612,6 +641,15 @@
     $("exportBtn").addEventListener("click", doDownload);
     $("canvasBtn").addEventListener("click", openCanvas);
     $("newBtn").addEventListener("click", () => { if (confirm("Start a new drawing? Your current one will be cleared.")) goToWelcome(); });
+
+    // game-scale preview: press & hold the Preview button
+    const pv = $("previewBtn");
+    pv.addEventListener("mousedown", (e) => { e.preventDefault(); enterPreview(); });
+    pv.addEventListener("touchstart", (e) => { e.preventDefault(); enterPreview(); }, { passive: false });
+    window.addEventListener("mouseup", exitPreview);
+    window.addEventListener("touchend", exitPreview);
+    window.addEventListener("touchcancel", exitPreview);
+    window.addEventListener("blur", exitPreview);
 
     colorInput.addEventListener("input", () => { selectColor(colorInput.value); if (state.tool === "eraser") selectTool("pencil"); });
 
