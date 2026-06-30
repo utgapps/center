@@ -1166,11 +1166,11 @@ CSS = """
                  clip-path:polygon(0 0, 0 72%, 22% 57%, 38% 94%, 52% 86%, 36% 52%, 64% 52%);
                  filter:drop-shadow(0 0 1px #fff); animation:ahCursor 7s infinite; }
     @keyframes ahCursor {
-      0%{transform:translate(20px,150px) scale(1)} 16%{transform:translate(122px,12px) scale(1)}
-      19%{transform:translate(122px,12px) scale(.8)} 23%{transform:translate(122px,12px) scale(1)}
-      33%{transform:translate(150px,76px) scale(1)} 60%{transform:translate(150px,76px) scale(1)}
-      70%{transform:translate(244px,102px) scale(1)} 73%{transform:translate(244px,102px) scale(.8)}
-      77%{transform:translate(244px,102px) scale(1)} 90%{transform:translate(244px,102px) scale(1)}
+      0%{transform:translate(20px,150px) scale(1)} 16%{transform:translate(122px,24px) scale(1)}
+      19%{transform:translate(122px,24px) scale(.8)} 23%{transform:translate(122px,24px) scale(1)}
+      33%{transform:translate(172px,84px) scale(1)} 60%{transform:translate(172px,84px) scale(1)}
+      70%{transform:translate(238px,124px) scale(1)} 73%{transform:translate(238px,124px) scale(.8)}
+      77%{transform:translate(238px,124px) scale(1)} 90%{transform:translate(238px,124px) scale(1)}
       100%{transform:translate(20px,150px) scale(1)} }
     @keyframes ahPlus { 0%,18%,23%,100%{box-shadow:none} 20%{box-shadow:0 0 0 4px rgba(0,123,255,.3)} }
     @keyframes ahDialog { 0%,17%{opacity:0;transform:scale(.95)} 23%,77%{opacity:1;transform:scale(1)} 82%,100%{opacity:0;transform:scale(.95)} }
