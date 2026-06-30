@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>🎨 Pixel Art Maker</title>
+  <title>Pixel Art Maker · UTG Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,26 +14,28 @@
   <!-- ===================== WELCOME SCREEN ===================== -->
   <div id="welcome" class="welcome">
     <div class="welcome-card">
-      <h1 class="logo">🎨 Pixel Art Maker</h1>
-      <p class="tagline">How big do you want your pixels? Pick a pixel size!</p>
+      <div class="brandmark"><span class="dot"></span>UTG&nbsp;Academy</div>
+      <h1 class="logo">Pixel Art Maker</h1>
+      <p class="tagline">Create pixel art and game sprites. Choose your pixel size to begin.</p>
 
+      <div class="field-label">Pixel size</div>
       <div class="size-presets">
-        <button class="preset" data-tile="8">🧩<span>8px</span><small>fine</small></button>
-        <button class="preset selected" data-tile="16">🟦<span>16px</span><small>medium</small></button>
-        <button class="preset" data-tile="32">⬛<span>32px</span><small>chunky</small></button>
-        <button class="preset" data-tile="64">🔲<span>64px</span><small>blocky</small></button>
+        <button class="preset" data-tile="8"><span>8px</span><small>fine</small></button>
+        <button class="preset selected" data-tile="16"><span>16px</span><small>medium</small></button>
+        <button class="preset" data-tile="32"><span>32px</span><small>large</small></button>
+        <button class="preset" data-tile="64"><span>64px</span><small>x-large</small></button>
       </div>
 
       <div class="custom-size">
-        <label>Picture size (the saved image):</label>
+        <div class="field-label">Canvas size <span class="muted">(exported image)</span></div>
         <div class="custom-row">
           <input type="number" id="canvasSize" min="32" max="2048" step="8" value="512" />
           <span>px</span>
         </div>
-        <p class="grid-hint" id="welcomeHint">That gives you a 32 × 32 grid of pixels to color.</p>
+        <p class="grid-hint" id="welcomeHint">That gives you a 32 × 32 grid of pixels.</p>
       </div>
 
-      <button id="startBtn" class="start-btn">✏️ Start Drawing!</button>
+      <button id="startBtn" class="start-btn">Open Editor →</button>
     </div>
   </div>
 
@@ -39,7 +44,7 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <div class="brand">🎨 <span>Pixel Art Maker</span></div>
+      <div class="brand"><span class="dot"></span><span>Pixel Art Maker</span></div>
       <div class="top-actions">
         <button id="undoBtn" class="tbtn" title="Undo">↶ Undo</button>
         <button id="redoBtn" class="tbtn" title="Redo">↷ Redo</button>
@@ -51,11 +56,11 @@
           <button class="tileBtn" data-tile="32" title="Each pixel is 32 px — 16×16 grid">32px<small>16×16</small></button>
           <button class="tileBtn" data-tile="64" title="Each pixel is 64 px — 8×8 grid">64px<small>8×8</small></button>
         </div>
-        <button id="gridBtn" class="tbtn active" title="Show / hide grid">▦ Grid</button>
-        <button id="canvasBtn" class="tbtn" title="Change the picture size">📐 Canvas</button>
+        <button id="gridBtn" class="tbtn active" title="Show / hide grid">Grid</button>
+        <button id="canvasBtn" class="tbtn" title="Change the canvas size">Canvas</button>
         <span class="divider"></span>
-        <button id="exportBtn" class="tbtn primary" title="Save your art as a picture">💾 Save Picture</button>
-        <button id="newBtn" class="tbtn" title="Start a new drawing">🆕 New</button>
+        <button id="exportBtn" class="tbtn primary" title="Export your art as a PNG">Export</button>
+        <button id="newBtn" class="tbtn" title="Start a new drawing">New</button>
       </div>
     </header>
 
@@ -75,7 +80,7 @@
           <button class="tool" data-tool="move"    title="Move everything">✋<span>Move</span></button>
         </div>
 
-        <h2 class="panel-title">Magic</h2>
+        <h2 class="panel-title">Transform</h2>
         <div class="tool-grid transforms">
           <button class="tool act" data-act="flipH"    title="Flip left/right">↔️<span>Flip</span></button>
           <button class="tool act" data-act="flipV"    title="Flip up/down">↕️<span>Flip</span></button>
@@ -109,9 +114,9 @@
   <!-- ===================== EXPORT SETTINGS MODAL ===================== -->
   <div id="exportModal" class="modal hidden">
     <div class="modal-card">
-      <h2>💾 Save Your Picture</h2>
+      <h2>Export Image</h2>
       <p class="modal-sub">Your drawing is <b id="gridInfo">32 × 32 pixels</b>.<br />
-        Choose how big the saved picture should be. <em>(This does not change your drawing or pixel size!)</em></p>
+        Choose the exported image size. <em>This won't change your drawing or pixel size.</em></p>
 
       <div class="scale-quick">
         <span>Quick size:</span>
@@ -131,12 +136,12 @@
         <label class="px">px</label>
       </div>
 
-      <label class="check"><input type="checkbox" id="lockAspect" checked /> Keep the same shape (lock width &amp; height)</label>
+      <label class="check"><input type="checkbox" id="lockAspect" checked /> Lock aspect ratio</label>
       <label class="check"><input type="checkbox" id="transparentBg" checked /> Transparent background</label>
 
       <div class="modal-actions">
         <button id="cancelExport" class="tbtn">Cancel</button>
-        <button id="downloadBtn" class="tbtn primary">⬇️ Download PNG</button>
+        <button id="downloadBtn" class="tbtn primary">Download PNG</button>
       </div>
     </div>
   </div>
@@ -144,8 +149,8 @@
   <!-- ===================== CANVAS SIZE MODAL ===================== -->
   <div id="canvasModal" class="modal hidden">
     <div class="modal-card">
-      <h2>📐 Change Canvas Size</h2>
-      <p class="modal-sub">This is your picture size in real pixels.<br />
+      <h2>Canvas Size</h2>
+      <p class="modal-sub">The canvas size in real pixels.<br />
         Your pixel size stays the same — the grid adjusts to fit.</p>
 
       <div class="export-fields">

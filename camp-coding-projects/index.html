@@ -1,90 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🏕️ Camp Coding Projects</title>
-  <style>
-    :root { --accent:#6c63ff; --accent2:#ff4d6d; --ink:#3a2c46; }
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Camp Coding Projects · UTG Academy</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap"><style>
+    :root { --brand:#01aefd; --brand-dark:#0294d8; --brand-ink:#0a6299; --brand-tint:#e7f7ff;
+            --gold:#ffd633; --ink:#1f2a37; --muted:#6b7787; --bg:#eef2f7; --surface:#fff; --border:#dbe3ec; }
     * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh;
-      font-family: "Comic Sans MS","Segoe UI Rounded",system-ui,sans-serif;
-      color: var(--ink);
-      background: radial-gradient(circle at 20% 10%, #fce4ff, #fef6ff 60%);
-      padding: 28px 18px 60px;
-    }
-    .wrap { max-width: 920px; margin: 0 auto; }
-    h1 { font-size: clamp(30px,6vw,44px); color: var(--accent2); text-shadow: 2px 2px 0 #ffb703; margin: 4px 0; text-align: center; }
-    .sub { text-align: center; color: #6b5b7a; font-size: 17px; margin: 0 auto 18px; max-width: 620px; }
-    .banner {
-      background: #fff; border: 3px solid #e9d6f5; border-radius: 18px;
-      padding: 14px 18px; margin: 0 auto 26px; max-width: 720px; text-align: center;
-      box-shadow: 0 5px 0 rgba(108,99,255,.15);
-      font-size: 15px; color: #4a3b58;
-    }
-    .banner a { color: var(--accent); font-weight: bold; text-decoration: none; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 16px; }
-    .card {
-      background: #fff; border: 4px solid #e9d6f5; border-radius: 20px;
-      padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 10px;
-      box-shadow: 0 6px 0 rgba(108,99,255,.15), 0 10px 22px rgba(58,44,70,.10);
-    }
-    .card .emoji { font-size: 34px; line-height: 1; }
-    .card .title { font-size: 20px; font-weight: bold; }
-    .card .meta { font-size: 12px; color: #9a86ad; margin-top: -4px; }
-    .btns { display: flex; gap: 8px; margin-top: auto; }
-    .btns a {
-      flex: 1; text-align: center; text-decoration: none; font-weight: bold;
-      border-radius: 12px; padding: 8px 6px; font-size: 14px; border: 3px solid;
-    }
-    .wb { color: #fff; background: var(--accent); border-color: var(--accent); }
-    .wb:hover { background: #5a51e8; }
-    .play { color: var(--accent2); background: #fff; border-color: var(--accent2); }
-    .play:hover { background: #ffe9ee; }
-    footer { text-align: center; color: #9a86ad; font-size: 13px; margin-top: 30px; }
-    footer a { color: var(--accent); }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>🏕️ Camp Coding Projects</h1>
-    <p class="sub">Pick a game and build it step by step — type the green lines, press Play, and learn to code!</p>
-
-    <div class="banner">
-      🎨 Each workbook lists the pictures (sprites) you need to draw. <b>Tap any sprite</b> to open the
-      <a href="../pixel-art-maker/">Pixel Art Maker</a> already set to the right size — just draw it and save your picture!
-    </div>
-
-    <div class="grid" id="grid"></div>
-
-    <footer>Part of <a href="../">center</a> · built on <a href="https://pixelpad.io" target="_blank">PixelPad</a></footer>
-  </div>
-
-  <script>
-    const PROJECTS = [
-      ["Catch the Fruit","catch",15,"🍎"],["Whack-a-Mole","whack",15,"🔨"],["Flappy Bird","flappy",19,"🐤"],
-      ["Subway Surfers","subway",18,"🏃"],["Geometry Dash","geo",22,"🔺"],["Crossy Road","crossy",18,"🐔"],
-      ["Pong","pong",20,"🏓"],["Brick Breaker","brick",23,"🧱"],["Doodle Jump","doodle",21,"🦘"],
-      ["Space Shooter","shooter",19,"🚀"],["Helicopter","heli",18,"🚁"],["Fruit Slice","slice",14,"🍉"],
-      ["Asteroid Dodge","dodge",16,"☄️"],["Stack Tower","stack",14,"🗼"],["Fishing","fishing",21,"🎣"],
-      ["Rhythm Tap","rhythm",16,"🎵"],["Lander","lander",16,"🛸"],["Platformer","platformer",26,"🏃‍♂️"],
-      ["Cookie Clicker","cookie",21,"🍪"],["Pac-Man","pacman",19,"😋"],
-    ];
-    const grid = document.getElementById("grid");
-    for (const [title, slug, steps, emoji] of PROJECTS) {
-      const c = document.createElement("div");
-      c.className = "card";
-      c.innerHTML =
-        `<div class="emoji">${emoji}</div>` +
-        `<div class="title">${title}</div>` +
-        `<div class="meta">${steps} steps</div>` +
-        `<div class="btns">` +
-          `<a class="wb" href="${slug}-workbook.html">📖 Workbook</a>` +
-          `<a class="play" href="${slug}-final.html" target="_blank">▶ Play</a>` +
-        `</div>`;
-      grid.appendChild(c);
-    }
-  </script>
-</body>
-</html>
+    body { margin:0; min-height:100vh; color:var(--ink);
+           font-family:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+           background:radial-gradient(1000px 520px at 50% -8%, rgba(1,174,253,.16), transparent 70%), var(--bg);
+           padding:56px 22px 80px; }
+    .wrap { max-width:980px; margin:0 auto; }
+    .brandmark { display:inline-flex; align-items:center; gap:9px; font-size:13px; font-weight:600;
+                 letter-spacing:.05em; text-transform:uppercase; color:var(--brand-ink); margin-bottom:16px; }
+    .brandmark .dot { width:13px; height:13px; border-radius:3px; background:var(--gold); box-shadow:0 0 0 3px rgba(1,174,253,.2); }
+    h1 { font-size:clamp(28px,5vw,40px); font-weight:700; letter-spacing:-.02em; margin:0 0 8px; }
+    .sub { color:var(--muted); font-size:17px; margin:0 0 22px; max-width:620px; line-height:1.5; }
+    .banner { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 18px;
+              margin:0 0 30px; max-width:760px; font-size:14px; color:#43505f; box-shadow:0 1px 3px rgba(31,42,55,.05); }
+    .banner a { color:var(--brand-ink); font-weight:600; text-decoration:none; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:16px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 18px 16px;
+            display:flex; flex-direction:column; gap:9px; box-shadow:0 1px 3px rgba(31,42,55,.05);
+            transition:border-color .15s, transform .1s, box-shadow .15s; }
+    .card:hover { border-color:var(--brand); transform:translateY(-3px); box-shadow:0 12px 28px rgba(1,174,253,.13); }
+    .card .emoji { width:42px; height:42px; border-radius:11px; display:grid; place-items:center;
+                   font-size:23px; background:var(--brand-tint); }
+    .card .title { font-size:18px; font-weight:600; }
+    .card .meta { font-size:12px; color:var(--muted); margin-top:-4px; }
+    .btns { display:flex; gap:8px; margin-top:auto; padding-top:4px; }
+    .btns a { flex:1; text-align:center; text-decoration:none; font-weight:600; border-radius:9px;
+              padding:9px 6px; font-size:14px; border:1px solid; }
+    .wb { color:#fff; background:var(--brand); border-color:var(--brand); }
+    .wb:hover { background:var(--brand-dark); }
+    .play { color:var(--brand-ink); background:var(--surface); border-color:var(--border); }
+    .play:hover { background:var(--brand-tint); border-color:var(--brand); }
+    footer { color:var(--muted); font-size:13px; margin-top:36px; }
+    footer a { color:var(--brand-ink); text-decoration:none; }
+</style></head><body><div class="wrap"><div class="brandmark"><span class="dot"></span>UTG Academy</div><h1>Camp Coding Projects</h1><p class="sub">Build real games step by step — follow each guide, run your code, and ship a finished game.</p><div class="banner">Each guide lists the sprites you need to draw. <b>Tap any sprite</b> to open the <a href="../pixel-art-maker/">Pixel Art Maker</a> at the right size — draw it, export it, and drop it into your game.</div><div class="grid"><div class="card"><div class="emoji">🍎</div><div class="title">Catch the Fruit</div><div class="meta">15 steps</div><div class="btns"><a class="wb" href="catch-workbook.html">Guide</a><a class="play" href="catch-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🔨</div><div class="title">Whack-a-Mole</div><div class="meta">15 steps</div><div class="btns"><a class="wb" href="whack-workbook.html">Guide</a><a class="play" href="whack-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🐤</div><div class="title">Flappy Bird</div><div class="meta">19 steps</div><div class="btns"><a class="wb" href="flappy-workbook.html">Guide</a><a class="play" href="flappy-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🏃</div><div class="title">Subway Surfers</div><div class="meta">18 steps</div><div class="btns"><a class="wb" href="subway-workbook.html">Guide</a><a class="play" href="subway-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🔺</div><div class="title">Geometry Dash</div><div class="meta">22 steps</div><div class="btns"><a class="wb" href="geo-workbook.html">Guide</a><a class="play" href="geo-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🐔</div><div class="title">Crossy Road</div><div class="meta">18 steps</div><div class="btns"><a class="wb" href="crossy-workbook.html">Guide</a><a class="play" href="crossy-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🏓</div><div class="title">Pong</div><div class="meta">20 steps</div><div class="btns"><a class="wb" href="pong-workbook.html">Guide</a><a class="play" href="pong-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🧱</div><div class="title">Brick Breaker</div><div class="meta">23 steps</div><div class="btns"><a class="wb" href="brick-workbook.html">Guide</a><a class="play" href="brick-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🦘</div><div class="title">Doodle Jump</div><div class="meta">21 steps</div><div class="btns"><a class="wb" href="doodle-workbook.html">Guide</a><a class="play" href="doodle-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🚀</div><div class="title">Space Shooter</div><div class="meta">19 steps</div><div class="btns"><a class="wb" href="shooter-workbook.html">Guide</a><a class="play" href="shooter-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🚁</div><div class="title">Helicopter</div><div class="meta">18 steps</div><div class="btns"><a class="wb" href="heli-workbook.html">Guide</a><a class="play" href="heli-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🍉</div><div class="title">Fruit Slice</div><div class="meta">14 steps</div><div class="btns"><a class="wb" href="slice-workbook.html">Guide</a><a class="play" href="slice-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">☄️</div><div class="title">Asteroid Dodge</div><div class="meta">16 steps</div><div class="btns"><a class="wb" href="dodge-workbook.html">Guide</a><a class="play" href="dodge-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🗼</div><div class="title">Stack Tower</div><div class="meta">14 steps</div><div class="btns"><a class="wb" href="stack-workbook.html">Guide</a><a class="play" href="stack-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🎣</div><div class="title">Fishing</div><div class="meta">21 steps</div><div class="btns"><a class="wb" href="fishing-workbook.html">Guide</a><a class="play" href="fishing-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🎵</div><div class="title">Rhythm Tap</div><div class="meta">16 steps</div><div class="btns"><a class="wb" href="rhythm-workbook.html">Guide</a><a class="play" href="rhythm-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🛸</div><div class="title">Lander</div><div class="meta">16 steps</div><div class="btns"><a class="wb" href="lander-workbook.html">Guide</a><a class="play" href="lander-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🏃‍♂️</div><div class="title">Platformer</div><div class="meta">26 steps</div><div class="btns"><a class="wb" href="platformer-workbook.html">Guide</a><a class="play" href="platformer-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">🍪</div><div class="title">Cookie Clicker</div><div class="meta">21 steps</div><div class="btns"><a class="wb" href="cookie-workbook.html">Guide</a><a class="play" href="cookie-final.html" target="_blank">Play</a></div></div><div class="card"><div class="emoji">😋</div><div class="title">Pac-Man</div><div class="meta">19 steps</div><div class="btns"><a class="wb" href="pacman-workbook.html">Guide</a><a class="play" href="pacman-final.html" target="_blank">Play</a></div></div></div><footer>Part of <a href="../">UTG Academy creative tools</a> &middot; built on <a href="https://pixelpad.io" target="_blank">PixelPad</a></footer></div></body></html>

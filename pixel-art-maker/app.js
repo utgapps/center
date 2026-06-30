@@ -411,7 +411,7 @@
   }
   function updateStatus() {
     const el = $("statusBar");
-    if (el) el.textContent = `🖼️ ${state.canvasW}×${state.canvasH} picture · ▦ ${state.tile}px pixels · ${state.w}×${state.h} grid`;
+    if (el) el.textContent = `${state.canvasW}×${state.canvasH} canvas · ${state.tile}px pixels · ${state.w}×${state.h} grid`;
   }
 
   // ============================================================
@@ -438,7 +438,7 @@
   //  Export
   // ============================================================
   function openExport() {
-    $("gridInfo").textContent = `${state.w} × ${state.h} pixels (each ${state.tile}px) on a ${state.canvasW} × ${state.canvasH} picture`;
+    $("gridInfo").textContent = `${state.w} × ${state.h} pixels (each ${state.tile}px) on a ${state.canvasW} × ${state.canvasH} canvas`;
     $("exportW").value = state.exportW;
     $("exportH").value = state.exportH;
     $("exportModal").classList.remove("hidden");
@@ -558,7 +558,7 @@
   }
   function updateWelcomeHint() {
     const g = welcomeGrid();
-    $("welcomeHint").textContent = `That gives you a ${g.w} × ${g.h} grid of pixels to color.`;
+    $("welcomeHint").textContent = `That gives you a ${g.w} × ${g.h} pixel grid.`;
   }
 
   function bind() {

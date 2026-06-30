@@ -41,6 +41,8 @@ Any of `canvas`, `cw`, `ch`, `px`/`tile`, `ew`, `eh`, or `editor=1` lands you di
 
 Every workbook's "Before you start" sprite list is **clickable**: each sprite (e.g. *"bird.png — draw it 30×30, yellow"*) links straight to the Pixel Art Maker with the canvas size pre-filled (`?cw=30&ch=30&px=1&editor=1`), so a kid taps it, draws the sprite at exactly the right size, and saves the PNG. `px=1` makes the drawing grid match the sprite's native pixel dimensions.
 
+This whole folder is generated — edit `camp-coding-projects/workbooks.py` and run `python workbooks.py` from that folder to rebuild every workbook, finished game, and the hub. The sprite-linking lives in `setup_block()`, so it survives regeneration. See `camp-coding-projects/RULES.md` for the full design rules.
+
 ## Run locally
 It's all static files. Just open `pixel-art-maker/index.html`, or serve the folder:
 
