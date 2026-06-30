@@ -36,6 +36,11 @@ Any of `canvas`, `cw`, `ch`, `px`/`tile`, `ew`, `eh`, or `editor=1` lands you di
 - `pixel-art-maker/?canvas=512&px=8` — 512px picture with 8px pixels (64×64 grid).
 - `pixel-art-maker/?canvas=256&px=32&export=1024` — chunky 8×8 grid on a 256px picture, saved at 1024×1024.
 
+### 🏕️ [Camp Coding Projects](./camp-coding-projects/)
+20 printable, step-by-step game workbooks (built on [PixelPad](https://pixelpad.io)) — Flappy Bird, Pac-Man, Pong, and more. Each lands on a hub linking every workbook and its playable finished game.
+
+Every workbook's "Before you start" sprite list is **clickable**: each sprite (e.g. *"bird.png — draw it 30×30, yellow"*) links straight to the Pixel Art Maker with the canvas size pre-filled (`?cw=30&ch=30&px=1&editor=1`), so a kid taps it, draws the sprite at exactly the right size, and saves the PNG. `px=1` makes the drawing grid match the sprite's native pixel dimensions.
+
 ## Run locally
 It's all static files. Just open `pixel-art-maker/index.html`, or serve the folder:
 

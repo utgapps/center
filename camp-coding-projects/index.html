@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏕️ Camp Coding Projects</title>
+  <style>
+    :root { --accent:#6c63ff; --accent2:#ff4d6d; --ink:#3a2c46; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: "Comic Sans MS","Segoe UI Rounded",system-ui,sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 10%, #fce4ff, #fef6ff 60%);
+      padding: 28px 18px 60px;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; }
+    h1 { font-size: clamp(30px,6vw,44px); color: var(--accent2); text-shadow: 2px 2px 0 #ffb703; margin: 4px 0; text-align: center; }
+    .sub { text-align: center; color: #6b5b7a; font-size: 17px; margin: 0 auto 18px; max-width: 620px; }
+    .banner {
+      background: #fff; border: 3px solid #e9d6f5; border-radius: 18px;
+      padding: 14px 18px; margin: 0 auto 26px; max-width: 720px; text-align: center;
+      box-shadow: 0 5px 0 rgba(108,99,255,.15);
+      font-size: 15px; color: #4a3b58;
+    }
+    .banner a { color: var(--accent); font-weight: bold; text-decoration: none; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 16px; }
+    .card {
+      background: #fff; border: 4px solid #e9d6f5; border-radius: 20px;
+      padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 10px;
+      box-shadow: 0 6px 0 rgba(108,99,255,.15), 0 10px 22px rgba(58,44,70,.10);
+    }
+    .card .emoji { font-size: 34px; line-height: 1; }
+    .card .title { font-size: 20px; font-weight: bold; }
+    .card .meta { font-size: 12px; color: #9a86ad; margin-top: -4px; }
+    .btns { display: flex; gap: 8px; margin-top: auto; }
+    .btns a {
+      flex: 1; text-align: center; text-decoration: none; font-weight: bold;
+      border-radius: 12px; padding: 8px 6px; font-size: 14px; border: 3px solid;
+    }
+    .wb { color: #fff; background: var(--accent); border-color: var(--accent); }
+    .wb:hover { background: #5a51e8; }
+    .play { color: var(--accent2); background: #fff; border-color: var(--accent2); }
+    .play:hover { background: #ffe9ee; }
+    footer { text-align: center; color: #9a86ad; font-size: 13px; margin-top: 30px; }
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🏕️ Camp Coding Projects</h1>
+    <p class="sub">Pick a game and build it step by step — type the green lines, press Play, and learn to code!</p>
+
+    <div class="banner">
+      🎨 Each workbook lists the pictures (sprites) you need to draw. <b>Tap any sprite</b> to open the
+      <a href="../pixel-art-maker/">Pixel Art Maker</a> already set to the right size — just draw it and save your picture!
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <footer>Part of <a href="../">center</a> · built on <a href="https://pixelpad.io" target="_blank">PixelPad</a></footer>
+  </div>
+
+  <script>
+    const PROJECTS = [
+      ["Catch the Fruit","catch",15,"🍎"],["Whack-a-Mole","whack",15,"🔨"],["Flappy Bird","flappy",19,"🐤"],
+      ["Subway Surfers","subway",18,"🏃"],["Geometry Dash","geo",22,"🔺"],["Crossy Road","crossy",18,"🐔"],
+      ["Pong","pong",20,"🏓"],["Brick Breaker","brick",23,"🧱"],["Doodle Jump","doodle",21,"🦘"],
+      ["Space Shooter","shooter",19,"🚀"],["Helicopter","heli",18,"🚁"],["Fruit Slice","slice",14,"🍉"],
+      ["Asteroid Dodge","dodge",16,"☄️"],["Stack Tower","stack",14,"🗼"],["Fishing","fishing",21,"🎣"],
+      ["Rhythm Tap","rhythm",16,"🎵"],["Lander","lander",16,"🛸"],["Platformer","platformer",26,"🏃‍♂️"],
+      ["Cookie Clicker","cookie",21,"🍪"],["Pac-Man","pacman",19,"😋"],
+    ];
+    const grid = document.getElementById("grid");
+    for (const [title, slug, steps, emoji] of PROJECTS) {
+      const c = document.createElement("div");
+      c.className = "card";
+      c.innerHTML =
+        `<div class="emoji">${emoji}</div>` +
+        `<div class="title">${title}</div>` +
+        `<div class="meta">${steps} steps</div>` +
+        `<div class="btns">` +
+          `<a class="wb" href="${slug}-workbook.html">📖 Workbook</a>` +
+          `<a class="play" href="${slug}-final.html" target="_blank">▶ Play</a>` +
+        `</div>`;
+      grid.appendChild(c);
+    }
+  </script>
+</body>
+</html>
