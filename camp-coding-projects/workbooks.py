@@ -1126,7 +1126,78 @@ CSS = """
     .sprite-tip { color:#0a6299; font-weight:600; font-size:13px; }
     @media print { .sprite-link { background:transparent; border:none; color:#15202b; padding:0; }
                    .sprite-tip { display:none; } }
+
+    /* "Show me" button + animated how-to-add popup (steps 3 & 4 of the setup) */
+    .howbtn { display:inline-block; cursor:pointer; font-size:12px; font-weight:600; color:#01aefd;
+              background:#e7f7ff; border:1px solid #b6e2fb; border-radius:7px; padding:1px 9px; margin-left:5px; }
+    .howbtn:hover { background:#d3eefb; }
+    .ah-toggle { position:absolute; width:0; height:0; opacity:0; pointer-events:none; }
+    .ah-modal { display:none; position:fixed; inset:0; z-index:120; align-items:center; justify-content:center; padding:18px; }
+    #ahc:checked ~ .ah-modal.for-class { display:flex; }
+    #ahr:checked ~ .ah-modal.for-room  { display:flex; }
+    .ah-backdrop { position:absolute; inset:0; background:rgba(31,42,55,.5); cursor:pointer; }
+    .ah-card { position:relative; background:#fff; border-radius:16px; padding:20px 22px 18px; width:380px; max-width:100%;
+               box-shadow:0 20px 60px rgba(31,42,55,.35); text-align:center; }
+    .ah-x { position:absolute; top:8px; right:14px; font-size:24px; line-height:1; color:#8a97a6; cursor:pointer; }
+    .ah-title { font-size:17px; font-weight:600; margin-bottom:14px; color:#1f2a37; }
+    .ah-cap { font-size:13px; color:#516170; margin-top:13px; }
+    .ah-cap b { color:#1f2a37; }
+    .ah-stage { position:relative; width:300px; height:170px; margin:0 auto; background:#f3f5f7;
+                border:1px solid #d6dbe2; border-radius:10px; overflow:hidden; }
+    .ah-side { position:absolute; left:0; top:0; width:128px; height:100%; background:#e7e9eb; border-right:1px solid #d2d6db; }
+    .ah-head { display:flex; align-items:center; justify-content:space-between; padding:7px 8px 4px 11px;
+               font-size:11px; font-weight:700; letter-spacing:.4px; color:#7a828c; }
+    .ah-plus { width:16px; height:16px; border-radius:5px; background:#01aefd; color:#fff; font-size:13px;
+               line-height:16px; text-align:center; animation:ahPlus 7s infinite; }
+    .ah-list { padding:2px 0; }
+    .ah-item { padding:4px 11px; font-size:12px; color:#343a40; }
+    .ah-item:first-child { color:#5a6470; }
+    .ah-new { overflow:hidden; max-height:0; opacity:0; border-radius:4px; margin:0 4px; animation:ahNew 7s infinite; }
+    .ah-dialog { position:absolute; left:96px; top:42px; width:178px; background:#fff; border:1px solid #c8cfd8;
+                 border-radius:8px; box-shadow:0 8px 22px rgba(0,0,0,.18); padding:9px 10px; opacity:0;
+                 transform:scale(.92); animation:ahDialog 7s infinite; }
+    .ah-dtitle { font-size:11px; font-weight:600; color:#6b7787; margin-bottom:6px; text-align:left; }
+    .ah-field { display:flex; align-items:center; height:22px; border:1px solid #c8cfd8; border-radius:5px; padding:0 6px; background:#fbfcfd; }
+    .ah-typed { display:inline-block; overflow:hidden; white-space:nowrap; max-width:0; font-size:12px; color:#1f2a37; animation:ahType 7s infinite; }
+    .ah-caret { width:1px; height:13px; background:#1f2a37; margin-left:1px; animation:ahBlink .7s steps(1) infinite; }
+    .ah-okrow { text-align:right; margin-top:8px; }
+    .ah-ok { display:inline-block; background:#01aefd; color:#fff; font-size:11px; font-weight:600; padding:3px 12px; border-radius:5px; animation:ahOk 7s infinite; }
+    .ah-cursor { position:absolute; left:0; top:0; width:15px; height:21px; background:#1f2a37; z-index:5;
+                 clip-path:polygon(0 0, 0 72%, 22% 57%, 38% 94%, 52% 86%, 36% 52%, 64% 52%);
+                 filter:drop-shadow(0 0 1px #fff); animation:ahCursor 7s infinite; }
+    @keyframes ahCursor {
+      0%{transform:translate(24px,150px) scale(1)} 16%{transform:translate(108px,12px) scale(1)}
+      19%{transform:translate(108px,12px) scale(.8)} 23%{transform:translate(108px,12px) scale(1)}
+      33%{transform:translate(150px,84px) scale(1)} 60%{transform:translate(150px,84px) scale(1)}
+      70%{transform:translate(238px,108px) scale(1)} 73%{transform:translate(238px,108px) scale(.8)}
+      77%{transform:translate(238px,108px) scale(1)} 90%{transform:translate(238px,108px) scale(1)}
+      100%{transform:translate(24px,150px) scale(1)} }
+    @keyframes ahPlus { 0%,18%,23%,100%{transform:scale(1);box-shadow:none} 20%{transform:scale(.78);box-shadow:0 0 0 4px rgba(1,174,253,.25)} }
+    @keyframes ahDialog { 0%,17%{opacity:0;transform:scale(.92)} 23%,77%{opacity:1;transform:scale(1)} 82%,100%{opacity:0;transform:scale(.92)} }
+    @keyframes ahType { 0%,30%{max-width:0} 56%,100%{max-width:96px} }
+    @keyframes ahBlink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+    @keyframes ahOk { 0%,71%,77%,100%{transform:scale(1);filter:none} 74%{transform:scale(.86);filter:brightness(.88)} }
+    @keyframes ahNew { 0%,78%{opacity:0;max-height:0;background:transparent} 84%{opacity:1;max-height:22px;background:#bfe9ff} 100%{opacity:1;max-height:22px;background:transparent} }
+    @media print { .howbtn, .ah-modal { display:none !important; } }
 """
+
+# Animated "how to add a Class/Room" popup (shown from setup items 3 & 4).
+def add_help_modal(tid, modal_cls, word, header, existing, typed):
+    items = "".join('<div class="ah-item">%s</div>' % html.escape(e) for e in existing)
+    return ('<input type="checkbox" id="%s" class="ah-toggle">'
+            '<div class="ah-modal %s"><label for="%s" class="ah-backdrop"></label>'
+            '<div class="ah-card"><label for="%s" class="ah-x">&times;</label>'
+            '<div class="ah-title">How to add a %s</div>'
+            '<div class="ah-stage">'
+            '<div class="ah-side"><div class="ah-head">%s<span class="ah-plus">+</span></div>'
+            '<div class="ah-list">%s<div class="ah-item ah-new">%s</div></div></div>'
+            '<div class="ah-dialog"><div class="ah-dtitle">New %s</div>'
+            '<div class="ah-field"><span class="ah-typed">%s</span><span class="ah-caret"></span></div>'
+            '<div class="ah-okrow"><span class="ah-ok">OK</span></div></div>'
+            '<div class="ah-cursor"></div></div>'
+            '<div class="ah-cap">Move to <b>+</b> next to <b>%s</b>, type the name, then press <b>OK</b>.</div>'
+            '</div></div>'
+            % (tid, modal_cls, tid, tid, word, header, items, html.escape(typed), word, html.escape(typed), header))
 
 def setup_block(game):
     dims = sprite_dims(game)
@@ -1144,15 +1215,20 @@ def setup_block(game):
     sprites = "<br>&nbsp;&nbsp;&nbsp;&bull; " + "<br>&nbsp;&nbsp;&nbsp;&bull; ".join(rows)
     classes = ", ".join("<b>%s</b>" % c for c in game["classes"] if c != "Game")
     rooms = ", ".join("<b>%s</b>" % r for r in game["rooms"])
+    ex_class = next((c for c in game["classes"] if c != "Game"), "Player")
+    ex_room = game["rooms"][0] if game["rooms"] else "Play"
     return ('<div class="setup"><b>Before you start:</b><br>'
             '1. Open a new PixelPad project.<br>'
             '2. Add these pictures (Sprites). Draw each on a pixel canvas of the size shown '
             '(width&times;height): <span class="sprite-tip">Tap a sprite to open the '
             'drawing app at the right size.</span>%s<br>'
-            '3. Add these Classes: %s.<br>'
-            '4. Add these Rooms: %s.<br>'
-            'Now follow the steps. Type only the <span class="g">green</span> lines each time.</div>'
-            % (sprites, classes, rooms))
+            '3. Add these Classes: %s. <label for="ahc" class="howbtn">&#9654; Show me</label><br>'
+            '4. Add these Rooms: %s. <label for="ahr" class="howbtn">&#9654; Show me</label><br>'
+            'Now follow the steps. Type only the <span class="g">green</span> lines each time.'
+            '%s%s</div>'
+            % (sprites, classes, rooms,
+               add_help_modal("ahc", "for-class", "Class", "CLASSES", ["Game"], ex_class),
+               add_help_modal("ahr", "for-room", "Room", "ROOMS", [], ex_room)))
 
 def render(game):
     pages, cum = [], {}
