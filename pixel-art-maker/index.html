@@ -52,6 +52,7 @@
           <button class="tileBtn" data-tile="64" title="Each pixel is 64 px — 8×8 grid">64px<small>8×8</small></button>
         </div>
         <button id="gridBtn" class="tbtn active" title="Show / hide grid">▦ Grid</button>
+        <button id="canvasBtn" class="tbtn" title="Change the picture size">📐 Canvas</button>
         <span class="divider"></span>
         <button id="exportBtn" class="tbtn primary" title="Save your art as a picture">💾 Save Picture</button>
         <button id="newBtn" class="tbtn" title="Start a new drawing">🆕 New</button>
@@ -136,6 +137,34 @@
       <div class="modal-actions">
         <button id="cancelExport" class="tbtn">Cancel</button>
         <button id="downloadBtn" class="tbtn primary">⬇️ Download PNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CANVAS SIZE MODAL ===================== -->
+  <div id="canvasModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>📐 Change Canvas Size</h2>
+      <p class="modal-sub">This is your picture size in real pixels.<br />
+        Your pixel size stays the same — the grid adjusts to fit.</p>
+
+      <div class="export-fields">
+        <label>Width
+          <input type="number" id="canvasModalW" min="8" max="4096" />
+        </label>
+        <span class="x">×</span>
+        <label>Height
+          <input type="number" id="canvasModalH" min="8" max="4096" />
+        </label>
+        <label class="px">px</label>
+      </div>
+
+      <label class="check"><input type="checkbox" id="canvasLockAspect" checked /> Maintain aspect ratio</label>
+      <p class="grid-hint" id="canvasModalHint"></p>
+
+      <div class="modal-actions">
+        <button id="cancelCanvas" class="tbtn">Cancel</button>
+        <button id="applyCanvas" class="tbtn primary">✓ Apply</button>
       </div>
     </div>
   </div>

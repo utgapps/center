@@ -415,6 +415,26 @@
   }
 
   // ============================================================
+  //  Canvas (picture) size — keeps pixel size, recomputes the grid.
+  //  The saved-picture (export) size follows the new picture size.
+  // ============================================================
+  function setCanvasSize(cw, ch) {
+    cw = clamp(cw | 0, 8, 4096);
+    ch = clamp(ch | 0, 8, 4096);
+    if (cw === state.canvasW && ch === state.canvasH) return;
+    pushUndo();
+    state.canvasW = cw; state.canvasH = ch;
+    const g = gridFor(cw, ch, state.tile);
+    state.data = resampleTo(g.w, g.h);
+    state.w = g.w; state.h = g.h;
+    state.exportW = cw; state.exportH = ch;   // export default tracks the picture size
+    state.pixelSize = fitPixelSize();
+    resizeCanvas();
+    updateTileButtons();
+    updateStatus();
+  }
+
+  // ============================================================
   //  Export
   // ============================================================
   function openExport() {
@@ -451,6 +471,28 @@
     a.href = off.toDataURL("image/png");
     a.click();
     closeExport();
+  }
+
+  // ============================================================
+  //  Canvas size modal
+  // ============================================================
+  function openCanvas() {
+    $("canvasModalW").value = state.canvasW;
+    $("canvasModalH").value = state.canvasH;
+    updateCanvasHint();
+    $("canvasModal").classList.remove("hidden");
+  }
+  function closeCanvas() { $("canvasModal").classList.add("hidden"); }
+  function updateCanvasHint() {
+    const w = parseInt($("canvasModalW").value, 10) || state.canvasW;
+    const h = parseInt($("canvasModalH").value, 10) || state.canvasH;
+    const g = gridFor(w, h, state.tile);
+    $("canvasModalHint").textContent = `Pixel size ${state.tile}px → a ${g.w} × ${g.h} grid of pixels.`;
+  }
+  function applyCanvas() {
+    setCanvasSize(parseInt($("canvasModalW").value, 10) || state.canvasW,
+                  parseInt($("canvasModalH").value, 10) || state.canvasH);
+    closeCanvas();
   }
 
   // ============================================================
@@ -558,6 +600,7 @@
       render();
     });
     $("exportBtn").addEventListener("click", openExport);
+    $("canvasBtn").addEventListener("click", openCanvas);
     $("newBtn").addEventListener("click", () => { if (confirm("Start a new drawing? Your current one will be cleared.")) goToWelcome(); });
 
     colorInput.addEventListener("input", () => { selectColor(colorInput.value); if (state.tool === "eraser") selectTool("pencil"); });
@@ -581,6 +624,28 @@
       const v = parseInt($("exportH").value, 10);
       if (Number.isFinite(v)) $("exportW").value = Math.round(v * baseRatio());
     });
+
+    // canvas size modal
+    let canvasRatio = 1;
+    $("cancelCanvas").addEventListener("click", closeCanvas);
+    $("applyCanvas").addEventListener("click", applyCanvas);
+    $("canvasModal").addEventListener("click", (e) => { if (e.target.id === "canvasModal") closeCanvas(); });
+    $("canvasBtn").addEventListener("click", () => { canvasRatio = state.canvasW / state.canvasH; });
+    $("canvasModalW").addEventListener("input", () => {
+      if ($("canvasLockAspect").checked) {
+        const v = parseInt($("canvasModalW").value, 10);
+        if (Number.isFinite(v)) $("canvasModalH").value = Math.max(8, Math.round(v / canvasRatio));
+      }
+      updateCanvasHint();
+    });
+    $("canvasModalH").addEventListener("input", () => {
+      if ($("canvasLockAspect").checked) {
+        const v = parseInt($("canvasModalH").value, 10);
+        if (Number.isFinite(v)) $("canvasModalW").value = Math.max(8, Math.round(v * canvasRatio));
+      }
+      updateCanvasHint();
+    });
+    $("canvasLockAspect").addEventListener("change", () => { canvasRatio = (parseInt($("canvasModalW").value, 10) || 1) / (parseInt($("canvasModalH").value, 10) || 1); });
 
     window.addEventListener("keydown", (e) => {
       if (editor.classList.contains("hidden")) return;
