@@ -1,0 +1,5 @@
+# Claude Code workspace config (not part of the site)
+.claude/
+
+# Archived projects kept locally (to be reorganized later)
+/archive/
