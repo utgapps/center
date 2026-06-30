@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>center — creative tools</title>
+  <style>
+    :root { --accent:#6c63ff; --accent2:#ff4d6d; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: "Comic Sans MS","Segoe UI Rounded",system-ui,sans-serif;
+      color: #3a2c46;
+      background: radial-gradient(circle at 20% 10%, #fce4ff, #fef6ff 60%);
+      display: grid; place-items: center; padding: 24px;
+    }
+    .hub { text-align: center; max-width: 640px; }
+    h1 { font-size: 40px; color: var(--accent); text-shadow: 2px 2px 0 #ffb703; margin-bottom: 4px; }
+    p.sub { color: #6b5b7a; font-size: 18px; margin-top: 0; }
+    .cards { display: grid; gap: 16px; margin-top: 24px; }
+    a.card {
+      display: block; text-decoration: none; color: inherit;
+      background: #fff; border: 4px solid #e9d6f5; border-radius: 22px;
+      padding: 22px 24px; text-align: left;
+      box-shadow: 0 6px 0 rgba(108,99,255,.18), 0 10px 24px rgba(58,44,70,.12);
+      transition: transform .1s;
+    }
+    a.card:hover { transform: translateY(-4px); }
+    a.card h2 { margin: 0 0 6px; font-size: 24px; }
+    a.card span { color: #6b5b7a; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <h1>center</h1>
+    <p class="sub">A little hub of creative tools.</p>
+    <div class="cards">
+      <a class="card" href="./pixel-art-maker/">
+        <h2>🎨 Pixel Art Maker</h2>
+        <span>A kid-friendly pixel art editor. Draw, fill, flip, turn, and save your art.</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🎨 Pixel Art Maker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== WELCOME SCREEN ===================== -->
+  <div id="welcome" class="welcome">
+    <div class="welcome-card">
+      <h1 class="logo">🎨 Pixel Art Maker</h1>
+      <p class="tagline">Make awesome pixel art! Pick a canvas size to start.</p>
+
+      <div class="size-presets">
+        <button class="preset" data-w="8"  data-h="8">🐣<span>Tiny</span><small>8 × 8</small></button>
+        <button class="preset" data-w="16" data-h="16">🙂<span>Small</span><small>16 × 16</small></button>
+        <button class="preset selected" data-w="32" data-h="32">🌟<span>Medium</span><small>32 × 32</small></button>
+        <button class="preset" data-w="64" data-h="64">🚀<span>Big</span><small>64 × 64</small></button>
+      </div>
+
+      <div class="custom-size">
+        <label>Or your own size:</label>
+        <div class="custom-row">
+          <input type="number" id="customW" min="2" max="128" value="32" />
+          <span>×</span>
+          <input type="number" id="customH" min="2" max="128" value="32" />
+        </div>
+      </div>
+
+      <button id="startBtn" class="start-btn">✏️ Start Drawing!</button>
+    </div>
+  </div>
+
+  <!-- ===================== EDITOR ===================== -->
+  <div id="editor" class="editor hidden">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="brand">🎨 <span>Pixel Art Maker</span></div>
+      <div class="top-actions">
+        <button id="undoBtn" class="tbtn" title="Undo">↶ Undo</button>
+        <button id="redoBtn" class="tbtn" title="Redo">↷ Redo</button>
+        <span class="divider"></span>
+        <button id="zoomOut" class="tbtn" title="Make pixels smaller on screen">🔍➖</button>
+        <span id="zoomLabel" class="zoom-label">Pixel size: 16</span>
+        <button id="zoomIn" class="tbtn" title="Make pixels bigger on screen">🔍➕</button>
+        <button id="gridBtn" class="tbtn active" title="Show / hide grid">▦ Grid</button>
+        <span class="divider"></span>
+        <button id="exportBtn" class="tbtn primary" title="Save your art as a picture">💾 Save Picture</button>
+        <button id="newBtn" class="tbtn" title="Start a new drawing">🆕 New</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <!-- Tools -->
+      <aside class="tools">
+        <h2 class="panel-title">Tools</h2>
+        <div class="tool-grid">
+          <button class="tool selected" data-tool="pencil"  title="Pencil">✏️<span>Pencil</span></button>
+          <button class="tool" data-tool="eraser"  title="Eraser">🧽<span>Eraser</span></button>
+          <button class="tool" data-tool="fill"    title="Fill">🪣<span>Fill</span></button>
+          <button class="tool" data-tool="picker"  title="Color picker">💧<span>Picker</span></button>
+          <button class="tool" data-tool="line"    title="Line">📏<span>Line</span></button>
+          <button class="tool" data-tool="rect"    title="Rectangle">▭<span>Box</span></button>
+          <button class="tool" data-tool="ellipse" title="Circle">⬭<span>Circle</span></button>
+          <button class="tool" data-tool="mirror"  title="Mirror pen">🪞<span>Mirror</span></button>
+          <button class="tool" data-tool="move"    title="Move everything">✋<span>Move</span></button>
+        </div>
+
+        <h2 class="panel-title">Magic</h2>
+        <div class="tool-grid transforms">
+          <button class="tool act" data-act="flipH"    title="Flip left/right">↔️<span>Flip</span></button>
+          <button class="tool act" data-act="flipV"    title="Flip up/down">↕️<span>Flip</span></button>
+          <button class="tool act" data-act="rotateL"  title="Turn left">↺<span>Turn L</span></button>
+          <button class="tool act" data-act="rotateR"  title="Turn right">↻<span>Turn R</span></button>
+          <button class="tool act danger" data-act="clear" title="Clear everything">🗑️<span>Clear</span></button>
+        </div>
+      </aside>
+
+      <!-- Canvas -->
+      <main class="canvas-area">
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="canvas"></canvas>
+        </div>
+      </main>
+
+      <!-- Colors -->
+      <aside class="colors">
+        <h2 class="panel-title">Color</h2>
+        <div class="current-color-row">
+          <div class="current-color" id="currentColor"></div>
+          <input type="color" id="colorInput" value="#ff4d6d" title="Pick any color" />
+        </div>
+        <h2 class="panel-title">Palette</h2>
+        <div class="palette" id="palette"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===================== EXPORT SETTINGS MODAL ===================== -->
+  <div id="exportModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>💾 Save Your Picture</h2>
+      <p class="modal-sub">Your drawing is <b id="gridInfo">32 × 32</b> pixels.<br />
+        Choose how big the saved picture should be. <em>(This does not change your drawing!)</em></p>
+
+      <div class="scale-quick">
+        <span>Quick size:</span>
+        <button class="scaleBtn" data-scale="1">1×</button>
+        <button class="scaleBtn" data-scale="8">8×</button>
+        <button class="scaleBtn" data-scale="16">16×</button>
+        <button class="scaleBtn" data-scale="32">32×</button>
+      </div>
+
+      <div class="export-fields">
+        <label>Width
+          <input type="number" id="exportW" min="1" max="8192" />
+        </label>
+        <span class="x">×</span>
+        <label>Height
+          <input type="number" id="exportH" min="1" max="8192" />
+        </label>
+        <label class="px">px</label>
+      </div>
+
+      <label class="check"><input type="checkbox" id="lockAspect" checked /> Keep the same shape (lock width &amp; height)</label>
+      <label class="check"><input type="checkbox" id="transparentBg" checked /> Transparent background</label>
+
+      <div class="modal-actions">
+        <button id="cancelExport" class="tbtn">Cancel</button>
+        <button id="downloadBtn" class="tbtn primary">⬇️ Download PNG</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
