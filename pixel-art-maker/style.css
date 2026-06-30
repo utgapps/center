@@ -63,6 +63,15 @@ html, body {
 .logo-img { height: 38px; width: auto; display: block; margin-bottom: 16px; }
 .logo-img.sm { height: 24px; margin: 0; }
 .brand-sep { width: 1px; height: 20px; background: var(--border); }
+.sprite-name {
+  font-family: var(--font); font-size: 15px; font-weight: 600; color: var(--ink);
+  border: 1px solid transparent; background: transparent;
+  border-radius: var(--radius-sm); padding: 6px 10px;
+  width: 150px; max-width: 38vw;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+.sprite-name:hover { background: var(--surface-2); }
+.sprite-name:focus { outline: none; background: #fff; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(1,174,253,.15); }
 .logo {
   font-size: 30px; font-weight: 700; letter-spacing: -.01em;
   margin: 0 0 6px; color: var(--ink);

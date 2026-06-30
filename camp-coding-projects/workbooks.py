@@ -1132,7 +1132,7 @@ def setup_block(game):
         # Each sprite links to the Pixel Art Maker with its canvas size pre-filled.
         # px=1 makes the drawing grid match the sprite's native pixel size; the saved
         # PNG comes out at exactly w*h, which is the size PixelPad expects.
-        href = '../pixel-art-maker/?cw=%d&ch=%d&px=1&editor=1' % (w, h)
+        href = '../pixel-art-maker/?cw=%d&ch=%d&px=1&editor=1&name=%s' % (w, h, n)
         rows.append('<a class="sprite-link" target="_blank" href="%s">'
                     '<b>%s</b> &mdash; draw it %d&times;%d, %s &#8599;</a>'
                     % (href, n, w, h, game["textures"][n]))

@@ -27,6 +27,7 @@ Open the editor pre-configured by adding parameters to the URL:
 | `px` / `tile` | Pixel size — real px per drawing pixel (8/16/32/64) | `?px=8` |
 | `ew`, `eh` | Saved-picture size override (defaults to picture size) | `?ew=1024&eh=1024` |
 | `export` | Shorthand for a square export override | `?export=1024` |
+| `name` | Sprite title / saved file name (aliases: `file`, `sprite`, `filename`) | `?name=bird.png` |
 | `editor=1` | Skip the welcome screen, go straight to drawing | `?editor=1` |
 
 Any of `canvas`, `cw`, `ch`, `px`/`tile`, `ew`, `eh`, or `editor=1` lands you directly on the drawing editor.

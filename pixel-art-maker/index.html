@@ -44,7 +44,12 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <div class="brand"><img class="logo-img sm" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" /><span class="brand-sep"></span><span>Pixel Art Maker</span></div>
+      <div class="brand">
+        <img class="logo-img sm" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" />
+        <span class="brand-sep"></span>
+        <input id="spriteName" class="sprite-name" value="my-art.png" spellcheck="false" autocomplete="off"
+               title="Name your sprite — this becomes the saved file name" aria-label="Sprite file name" />
+      </div>
       <div class="top-actions">
         <button id="undoBtn" class="tbtn" title="Undo">↶ Undo</button>
         <button id="redoBtn" class="tbtn" title="Redo">↷ Redo</button>
@@ -134,6 +139,12 @@
           <input type="number" id="exportH" min="1" max="8192" />
         </label>
         <label class="px">px</label>
+      </div>
+
+      <div class="export-fields">
+        <label style="flex:1">File name
+          <input type="text" id="exportName" spellcheck="false" autocomplete="off" />
+        </label>
       </div>
 
       <label class="check"><input type="checkbox" id="lockAspect" checked /> Lock aspect ratio</label>

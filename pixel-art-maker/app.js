@@ -30,6 +30,7 @@
   const MAX_GRID = 256;               // safety cap on colorable squares per side
   const DEFAULT_CANVAS = 512;
   const DEFAULT_TILE = 16;
+  const DEFAULT_NAME = "my-art.png";
 
   // ---------- State ----------
   const state = {
@@ -41,6 +42,7 @@
     pixelSize: 16,             // on-screen size of one tile (display fit only)
     data: [],                  // flat array length w*h, hex string or null
     tool: "pencil",
+    name: DEFAULT_NAME,        // sprite file name (editable title; used on export)
     color: "#ff4d6d",
     showGrid: true,
     exportW: null,             // saved-picture size (defaults to canvas size)
@@ -437,10 +439,25 @@
   // ============================================================
   //  Export
   // ============================================================
+  // Turn the sprite title into a safe .png file name.
+  function fileName() {
+    let n = (state.name || "").trim();
+    if (!n) n = "my-art";
+    n = n.replace(/[\\/:*?"<>|]/g, "").trim();   // strip illegal filename characters
+    if (!n) n = "my-art";
+    if (!/\.png$/i.test(n)) n += ".png";
+    return n;
+  }
+  function setName(n) {
+    state.name = (n || "").replace(/[\\/:*?"<>|]/g, "");
+    const top = $("spriteName"); if (top && top.value !== state.name) top.value = state.name;
+  }
+
   function openExport() {
     $("gridInfo").textContent = `${state.w} × ${state.h} pixels (each ${state.tile}px) on a ${state.canvasW} × ${state.canvasH} canvas`;
     $("exportW").value = state.exportW;
     $("exportH").value = state.exportH;
+    $("exportName").value = state.name;
     $("exportModal").classList.remove("hidden");
   }
   function closeExport() { $("exportModal").classList.add("hidden"); }
@@ -449,6 +466,7 @@
     const ew = clamp(parseInt($("exportW").value, 10) || state.canvasW, 1, 8192);
     const eh = clamp(parseInt($("exportH").value, 10) || state.canvasH, 1, 8192);
     state.exportW = ew; state.exportH = eh;
+    setName($("exportName").value);             // the modal field can rename too
     const transparent = $("transparentBg").checked;
 
     const off = document.createElement("canvas");
@@ -467,7 +485,7 @@
     }
 
     const a = document.createElement("a");
-    a.download = `pixel-art-${state.w}x${state.h}.png`;
+    a.download = fileName();
     a.href = off.toDataURL("image/png");
     a.click();
     closeExport();
@@ -512,6 +530,8 @@
     state.exportW = opts.exportW ? clamp(opts.exportW | 0, 1, 8192) : state.canvasW;
     state.exportH = opts.exportH ? clamp(opts.exportH | 0, 1, 8192) : state.canvasH;
 
+    setName(opts.name || DEFAULT_NAME);   // sprite title / file name
+
     welcome.classList.add("hidden");
     editor.classList.remove("hidden");
     state.pixelSize = fitPixelSize();   // measure after the editor is visible
@@ -531,6 +551,7 @@
   //    ?tile=8            tile size (8/16/32/64) — the "bit" value
   //    ?ew=1024&eh=1024   saved-picture size override (else = picture size)
   //    ?export=1024       shorthand square export override
+  //    ?name=bird.png     sprite title / saved file name  [aliases: file, sprite, filename]
   //    ?editor=1          skip the welcome screen
   // ============================================================
   function readQuery() {
@@ -543,8 +564,9 @@
     let ew = num("ew"), eh = num("eh");
     const exp = num("export");
     if (exp != null) { ew = ew ?? exp; eh = eh ?? exp; }
-    const wantsEditor = q.get("editor") === "1" || cw != null || ch != null || tile != null || ew != null || eh != null;
-    return { cw, ch, tile, ew, eh, wantsEditor };
+    const name = q.get("name") || q.get("file") || q.get("sprite") || q.get("filename");
+    const wantsEditor = q.get("editor") === "1" || cw != null || ch != null || tile != null || ew != null || eh != null || !!name;
+    return { cw, ch, tile, ew, eh, name, wantsEditor };
   }
 
   // ============================================================
@@ -604,6 +626,8 @@
     $("newBtn").addEventListener("click", () => { if (confirm("Start a new drawing? Your current one will be cleared.")) goToWelcome(); });
 
     colorInput.addEventListener("input", () => { selectColor(colorInput.value); if (state.tool === "eraser") selectTool("pencil"); });
+
+    $("spriteName").addEventListener("input", () => { state.name = $("spriteName").value; });
 
     $("cancelExport").addEventListener("click", closeExport);
     $("downloadBtn").addEventListener("click", doDownload);
@@ -674,7 +698,7 @@
 
     const q = readQuery();
     if (q.wantsEditor) {
-      startEditor(q.cw ?? DEFAULT_CANVAS, q.ch ?? DEFAULT_CANVAS, { tile: q.tile, exportW: q.ew, exportH: q.eh });
+      startEditor(q.cw ?? DEFAULT_CANVAS, q.ch ?? DEFAULT_CANVAS, { tile: q.tile, exportW: q.ew, exportH: q.eh, name: q.name });
     }
   }
 
