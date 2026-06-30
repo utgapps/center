@@ -22,11 +22,7 @@
         var(--bg);
     }
     .wrap { max-width:880px; margin:0 auto; padding:64px 22px 80px; }
-    .brandmark {
-      display:inline-flex; align-items:center; gap:9px; font-size:13px; font-weight:600;
-      letter-spacing:.05em; text-transform:uppercase; color:var(--brand-ink); margin-bottom:18px;
-    }
-    .brandmark .dot { width:13px; height:13px; border-radius:3px; background:var(--gold); box-shadow:0 0 0 3px rgba(1,174,253,.2); }
+    .logo-img { height:42px; width:auto; display:block; margin-bottom:20px; }
     h1 { font-size:clamp(30px,5vw,42px); font-weight:700; letter-spacing:-.02em; margin:0 0 8px; }
     .sub { color:var(--muted); font-size:17px; margin:0 0 36px; max-width:560px; line-height:1.5; }
     .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; }
@@ -47,7 +43,7 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="brandmark"><span class="dot"></span>UTG Academy</div>
+    <img class="logo-img" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" />
     <h1>Creative Tools</h1>
     <p class="sub">A small suite of browser-based tools and coding projects — make pixel art, build games, and ship them straight from your browser.</p>
 
@@ -61,12 +57,12 @@
       <a class="card" href="./camp-coding-projects/">
         <div class="ico">🕹️</div>
         <h2>Camp Coding Projects</h2>
-        <span>20 step-by-step game build guides. Tap a sprite to open it in the Pixel Art Maker at the right size.</span>
+        <span>20 step-by-step Python coding projects — build a real, playable game one line at a time.</span>
         <div class="go">Browse projects →</div>
       </a>
     </div>
 
-    <footer>UTG Academy · <a href="https://utgacademy.com" target="_blank">utgacademy.com</a></footer>
+    <footer>&copy; 2026 UTG Academy</footer>
   </div>
 </body>
 </html>

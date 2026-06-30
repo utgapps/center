@@ -817,6 +817,10 @@ GAMES.append({
   S("Play","start","Make your rocket. Press Play - it falls.",["Game.rocket = Rocket()"], play=True),
   S("Rocket","loop","Gravity pulls down; HOLD Space to fire the thruster up. Press Play - slow your fall!",
     ["self.speedY = self.speedY - self.gravity","if key_is_pressed(' ') or mouse_is_pressed('left'):","    self.speedY = self.speedY + 0.4","self.y = self.y + self.speedY"], play=True),
+  S("Play","start","Add a speed meter - a label that warns you when you fall too fast.",
+    ["Game.meter = text()","Game.meter.y = 150","Game.meter.color = \"lime\"","Game.meter.text = 'Speed OK'"], play=True),
+  S("Rocket","loop","Turn the meter RED when you drop too fast (faster than -3). Press Play - watch the warning!",
+    ["if self.speedY < -3:","    Game.meter.text = 'TOO FAST!'","    Game.meter.color = \"red\"","if self.speedY > -3:","    Game.meter.text = 'Speed OK'","    Game.meter.color = \"lime\""], play=True),
   S("Rocket","loop","Land slow and gentle to score a point. Press Play - touch down softly!",
     ["if self.y < -170 and self.speedY > -3:","    Game.score = Game.score + 1","    self.y = 200","    self.speedY = 0"], play=True),
   S("Rocket","loop","Come down too fast and you CRASH = lose a life. Press Play - easy does it!",
@@ -1144,9 +1148,8 @@ HUB_CSS = """
            background:radial-gradient(1000px 520px at 50% -8%, rgba(1,174,253,.16), transparent 70%), var(--bg);
            padding:56px 22px 80px; }
     .wrap { max-width:980px; margin:0 auto; }
-    .brandmark { display:inline-flex; align-items:center; gap:9px; font-size:13px; font-weight:600;
-                 letter-spacing:.05em; text-transform:uppercase; color:var(--brand-ink); margin-bottom:16px; }
-    .brandmark .dot { width:13px; height:13px; border-radius:3px; background:var(--gold); box-shadow:0 0 0 3px rgba(1,174,253,.2); }
+    .logo-link { display:inline-block; margin-bottom:18px; }
+    .logo-img { height:38px; width:auto; display:block; }
     h1 { font-size:clamp(28px,5vw,40px); font-weight:700; letter-spacing:-.02em; margin:0 0 8px; }
     .sub { color:var(--muted); font-size:17px; margin:0 0 22px; max-width:620px; line-height:1.5; }
     .banner { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 18px;
@@ -1177,6 +1180,8 @@ FONT_LINK = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
              '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
              'family=Rubik:wght@400;500;600;700&display=swap">')
 
+LOGO_URL = "https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg"
+
 # No copy/paste: the whole point is that kids TYPE each line. Block selection,
 # copy/cut/paste, right-click and drag (clicks, links and printing still work).
 NOCOPY = ('<script>["copy","cut","paste","contextmenu","selectstart","dragstart"]'
@@ -1196,16 +1201,15 @@ def index():
     doc = ('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
            '<meta name="viewport" content="width=device-width, initial-scale=1">'
            '<title>Camp Coding Projects · UTG Academy</title>%s<style>%s</style></head><body>'
-           '<div class="wrap"><div class="brandmark"><span class="dot"></span>UTG Academy</div>'
+           '<div class="wrap"><a class="logo-link" href="../"><img class="logo-img" src="%s" alt="UTG Academy"></a>'
            '<h1>Camp Coding Projects</h1>'
-           '<p class="sub">Build real games step by step — follow each guide, run your code, and ship a finished game.</p>'
-           '<div class="banner">Each guide lists the sprites you need to draw. '
-           '<b>Tap any sprite</b> to open the <a href="../pixel-art-maker/">Pixel Art Maker</a> at the right '
-           'size — draw it, export it, and drop it into your game.</div>'
+           '<p class="sub">Learn to code real games in Python. Each project takes you from a blank file to a '
+           'finished, playable game — one step at a time.</p>'
+           '<div class="banner">Every project is a hands-on Python coding challenge: type each line yourself, '
+           'run your code, and watch your game come to life. Start with any project below.</div>'
            '<div class="grid">%s</div>'
-           '<footer>Part of <a href="../">UTG Academy creative tools</a> &middot; built on '
-           '<a href="https://pixelpad.io" target="_blank">PixelPad</a></footer>'
-           '</div></body></html>' % (FONT_LINK, HUB_CSS, "".join(cards)))
+           '<footer>&copy; 2026 UTG Academy</footer>'
+           '</div></body></html>' % (FONT_LINK, HUB_CSS, LOGO_URL, "".join(cards)))
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(doc)
 

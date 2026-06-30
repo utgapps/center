@@ -60,16 +60,9 @@ html, body {
   max-width: 480px;
   width: 100%;
 }
-.brandmark {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-  color: var(--brand-ink); margin-bottom: 14px;
-}
-.brandmark .dot, .brand .dot {
-  width: 12px; height: 12px; border-radius: 3px;
-  background: var(--gold);
-  box-shadow: 0 0 0 3px rgba(1,174,253,.18);
-}
+.logo-img { height: 38px; width: auto; display: block; margin-bottom: 16px; }
+.logo-img.sm { height: 24px; margin: 0; }
+.brand-sep { width: 1px; height: 20px; background: var(--border); }
 .logo {
   font-size: 30px; font-weight: 700; letter-spacing: -.01em;
   margin: 0 0 6px; color: var(--ink);
