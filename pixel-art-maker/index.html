@@ -15,10 +15,10 @@
       <p class="tagline">Make awesome pixel art! Pick a canvas size to start.</p>
 
       <div class="size-presets">
-        <button class="preset" data-w="8"  data-h="8">🐣<span>Tiny</span><small>8 × 8</small></button>
-        <button class="preset" data-w="16" data-h="16">🙂<span>Small</span><small>16 × 16</small></button>
-        <button class="preset selected" data-w="32" data-h="32">🌟<span>Medium</span><small>32 × 32</small></button>
-        <button class="preset" data-w="64" data-h="64">🚀<span>Big</span><small>64 × 64</small></button>
+        <button class="preset" data-w="8"  data-h="8">🐣<span>8-bit</span><small>8 × 8</small></button>
+        <button class="preset" data-w="16" data-h="16">🙂<span>16-bit</span><small>16 × 16</small></button>
+        <button class="preset selected" data-w="32" data-h="32">🌟<span>32-bit</span><small>32 × 32</small></button>
+        <button class="preset" data-w="64" data-h="64">🚀<span>64-bit</span><small>64 × 64</small></button>
       </div>
 
       <div class="custom-size">
@@ -44,9 +44,13 @@
         <button id="undoBtn" class="tbtn" title="Undo">↶ Undo</button>
         <button id="redoBtn" class="tbtn" title="Redo">↷ Redo</button>
         <span class="divider"></span>
-        <button id="zoomOut" class="tbtn" title="Make pixels smaller on screen">🔍➖</button>
-        <span id="zoomLabel" class="zoom-label">Pixel size: 16</span>
-        <button id="zoomIn" class="tbtn" title="Make pixels bigger on screen">🔍➕</button>
+        <span class="res-title">Pixels:</span>
+        <div class="res-group">
+          <button class="resBtn" data-res="8"  title="8 × 8 canvas">8-bit<small>8×8</small></button>
+          <button class="resBtn" data-res="16" title="16 × 16 canvas">16-bit<small>16×16</small></button>
+          <button class="resBtn" data-res="32" title="32 × 32 canvas">32-bit<small>32×32</small></button>
+          <button class="resBtn" data-res="64" title="64 × 64 canvas">64-bit<small>64×64</small></button>
+        </div>
         <button id="gridBtn" class="tbtn active" title="Show / hide grid">▦ Grid</button>
         <span class="divider"></span>
         <button id="exportBtn" class="tbtn primary" title="Save your art as a picture">💾 Save Picture</button>

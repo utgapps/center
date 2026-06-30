@@ -42,7 +42,6 @@
   const paletteEl = $("palette");
   const currentColorEl = $("currentColor");
   const colorInput = $("colorInput");
-  const zoomLabel = $("zoomLabel");
 
   // ============================================================
   //  Setup helpers
@@ -125,25 +124,30 @@
   // ============================================================
   //  History (undo / redo)
   // ============================================================
+  function snapshot() { return { w: state.w, h: state.h, data: state.data.slice() }; }
+  function restore(s) {
+    state.w = s.w; state.h = s.h; state.data = s.data.slice();
+    state.pixelSize = fitPixelSize();
+    resizeCanvas();
+    updateResButtons();
+  }
   function pushUndo() {
-    state.undo.push(state.data.slice());
+    state.undo.push(snapshot());
     if (state.undo.length > 60) state.undo.shift();
     state.redo.length = 0;
     updateHistoryButtons();
   }
   function undo() {
     if (!state.undo.length) return;
-    state.redo.push(state.data.slice());
-    state.data = state.undo.pop();
+    state.redo.push(snapshot());
+    restore(state.undo.pop());
     updateHistoryButtons();
-    render();
   }
   function redo() {
     if (!state.redo.length) return;
-    state.undo.push(state.data.slice());
-    state.data = state.redo.pop();
+    state.undo.push(snapshot());
+    restore(state.redo.pop());
     updateHistoryButtons();
-    render();
   }
   function updateHistoryButtons() {
     $("undoBtn").disabled = state.undo.length === 0;
@@ -364,10 +368,11 @@
       }
     }
     state.w = nw; state.h = nh; state.data = next;
+    // rotating swaps width/height, so swap the export size to keep the same shape
+    const t = state.exportW; state.exportW = state.exportH; state.exportH = t;
     state.pixelSize = fitPixelSize();
-    syncExportToGridDefault();
     resizeCanvas();
-    updateZoomLabel();
+    updateResButtons();
   }
   function clearAll() {
     pushUndo();
@@ -414,14 +419,32 @@
   }
 
   // ============================================================
-  //  Zoom (pixel size on screen — NOT export size)
+  //  Resolution — the pixels-across of the canvas (8 / 16 / 32 / 64).
+  //  Changing it resamples the art but NEVER changes the export size;
+  //  export size only changes through the Save Picture menu / query string.
   // ============================================================
-  function setPixelSize(ps) {
-    state.pixelSize = clamp(ps, MIN_PIXEL, MAX_PIXEL);
+  function setResolution(n) {
+    n = clamp(n | 0, 2, 128);
+    if (n === state.w && n === state.h) { updateResButtons(); return; }
+    pushUndo();
+    const next = new Array(n * n).fill(null);
+    for (let ny = 0; ny < n; ny++) {
+      for (let nx = 0; nx < n; nx++) {
+        const sx = Math.min(state.w - 1, Math.floor(nx * state.w / n));
+        const sy = Math.min(state.h - 1, Math.floor(ny * state.h / n));
+        next[ny * n + nx] = state.data[sy * state.w + sx];
+      }
+    }
+    state.w = n; state.h = n; state.data = next;
+    state.pixelSize = fitPixelSize();
     resizeCanvas();
-    updateZoomLabel();
+    updateResButtons();
+    // export size deliberately left untouched
   }
-  function updateZoomLabel() { zoomLabel.textContent = "Pixel size: " + state.pixelSize; }
+  function updateResButtons() {
+    document.querySelectorAll(".resBtn").forEach(b =>
+      b.classList.toggle("active", parseInt(b.dataset.res, 10) === state.w && state.w === state.h));
+  }
 
   // ============================================================
   //  Export
@@ -494,7 +517,7 @@
     // measure AFTER the editor is visible, or the canvas area has zero size
     state.pixelSize = fitPixelSize();
     resizeCanvas();
-    updateZoomLabel();
+    updateResButtons();
     updateHistoryButtons();
     selectColor(state.color);
     selectTool("pencil");
@@ -567,8 +590,8 @@
     // top bar
     $("undoBtn").addEventListener("click", undo);
     $("redoBtn").addEventListener("click", redo);
-    $("zoomIn").addEventListener("click", () => setPixelSize(state.pixelSize + 2));
-    $("zoomOut").addEventListener("click", () => setPixelSize(state.pixelSize - 2));
+    document.querySelectorAll(".resBtn").forEach(b =>
+      b.addEventListener("click", () => setResolution(parseInt(b.dataset.res, 10))));
     $("gridBtn").addEventListener("click", () => {
       state.showGrid = !state.showGrid;
       $("gridBtn").classList.toggle("active", state.showGrid);
@@ -618,9 +641,11 @@
       if (map[e.key.toLowerCase()]) selectTool(map[e.key.toLowerCase()]);
     });
 
-    // keep a sensible zoom when the window resizes (only if user hasn't gone tiny/huge)
+    // re-fit the on-screen pixel size when the window resizes
     window.addEventListener("resize", () => {
       if (editor.classList.contains("hidden")) return;
+      state.pixelSize = fitPixelSize();
+      resizeCanvas();
     });
   }
 
