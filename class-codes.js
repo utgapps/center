@@ -17,7 +17,5 @@
    can take a little while to take effect at home.)
    ============================================================ */
 window.CLASS_CODES = [
-  { code: "DEMO", label: "Open access (demo)", enabled: true,  tools: "all" },
-  { code: "ARTS", label: "Pixel Art class",    enabled: false, tools: ["pixel-art"] },
-  { code: "CODE", label: "Coding class",        enabled: false, tools: ["camp"] },
+  { code: "QWER", label: "All resources", enabled: true, tools: "all" },
 ];
