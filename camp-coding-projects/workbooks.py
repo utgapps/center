@@ -1018,7 +1018,9 @@ def code_panel(asset, tab, all_lines, new_count):
 CSS = """
     @page { size: letter; margin: 14mm; }
     * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    body { margin:0; font-family: 'Rubik', 'Segoe UI', system-ui, sans-serif; color:#15202b; background:#fff; }
+    body { margin:0; font-family: 'Rubik', 'Segoe UI', system-ui, sans-serif; color:#15202b; background:#fff;
+           -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+           -webkit-touch-callout:none; }
     .printbtn { position:fixed; top:14px; right:18px; z-index:50; background:#01aefd; color:#fff;
                 border:0; border-radius:10px; padding:11px 18px; font-size:15px; font-weight:600;
                 cursor:pointer; box-shadow:0 6px 18px rgba(1,174,253,.4); text-decoration:none; }
@@ -1121,7 +1123,7 @@ def render(game):
            '<meta name="viewport" content="width=device-width, initial-scale=1">'
            '<title>%s - Workbook</title>%s<style>%s</style></head><body>'
            '<button class="printbtn" onclick="window.print()">&#128424;&nbsp; Print to PDF</button>'
-           '%s%s</body></html>' % (html.escape(game["title"]), FONT_LINK, CSS, intro, "".join(pages)))
+           '%s%s%s</body></html>' % (html.escape(game["title"]), FONT_LINK, CSS, intro, "".join(pages), NOCOPY))
     with open(game["slug"] + "-workbook.html", "w", encoding="utf-8") as f:
         f.write(doc)
 
@@ -1174,6 +1176,12 @@ FONT_LINK = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
              '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
              '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
              'family=Rubik:wght@400;500;600;700&display=swap">')
+
+# No copy/paste: the whole point is that kids TYPE each line. Block selection,
+# copy/cut/paste, right-click and drag (clicks, links and printing still work).
+NOCOPY = ('<script>["copy","cut","paste","contextmenu","selectstart","dragstart"]'
+          '.forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},'
+          '{capture:true});});</script>')
 
 def index():
     cards = []
