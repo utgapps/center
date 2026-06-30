@@ -958,6 +958,59 @@ GAMES.append({
   S("Play","loop","Keep the label updated. Press Play.",["Game.label.text = 'Score: ' + str(Game.score) + '   Lives: ' + str(Game.lives)"], play=True),
  ] + GO()})
 
+# 21) DRIFT RUSH - top-down car drifting.
+#  The car's NOSE is a little arrow (hx, hy). Pressing Up pushes the car the way
+#  the nose points. The car also has its own speed (vx, vy) that keeps its
+#  momentum, so when you turn hard the car keeps sliding the old way while the
+#  nose points the new way = a drift. "Grip" pulls the slide back toward the
+#  nose; the handbrake (Space) drops the grip so you slide more.
+#  Kept to + - * and < > only: the nose is turned with a tiny area-preserving
+#  spin (the 0.07), and the sideways slide is found with a dot product.
+GAMES.append({
+ "title":"Drift Rush","slug":"drift","classes":["Game","Track","Car","Cone"],"rooms":["Play","GameOver"],
+ "textures": tex({"car.png":"red","cone.png":"orange","track.png":"dark"}),
+ "steps":[
+  S("Game","start","Set up: a drift score, 3 lives, then go to Play.",
+    ["self.score = 0","self.lives = 3","self.dead = False","set_room('Play')"]),
+  S("Track","start","Add a Class called Track - the dark road.",
+    ["self.image = sprite('track.png')","self.scaleX = 760","self.scaleY = 560","self.z = -10"]),
+  S("Play","start","In the Play room, make the road. Press Play.",["Game.track = Track()"], play=True),
+  S("Car","start","Add a Class called Car. hx and hy are the nose - it starts pointing right.",
+    ["self.image = sprite('car.png')","self.scaleX = 44","self.scaleY = 24","self.hx = 1","self.hy = 0"]),
+  S("Car","start","Give the car a speed across (vx) and up-down (vy). It starts still.",
+    ["self.vx = 0","self.vy = 0"]),
+  S("Play","start","Make your car in the middle. Press Play.",["Game.car = Car()"], play=True),
+  S("Car","loop","Press Up to push the car the way the nose points, then move. Press Play - drive!",
+    ["if key_is_pressed('arrowUp') or key_is_pressed('w'):","    self.vx = self.vx + self.hx * 0.3","    self.vy = self.vy + self.hy * 0.3",
+     "self.x = self.x + self.vx","self.y = self.y + self.vy"], play=True),
+  S("Car","loop","Steer LEFT: spin the nose a little and turn the picture too. Press Play - hold Left!",
+    ["if key_is_pressed('arrowLeft') or key_is_pressed('a'):","    self.hx = self.hx - self.hy * 0.07","    self.hy = self.hy + self.hx * 0.07","    self.angle = self.angle + 4"], play=True),
+  S("Car","loop","Steer RIGHT the same way, the other direction. Press Play - turn both ways!",
+    ["if key_is_pressed('arrowRight') or key_is_pressed('d'):","    self.hx = self.hx + self.hy * 0.07","    self.hy = self.hy - self.hx * 0.07","    self.angle = self.angle - 4"], play=True),
+  S("Car","loop","Slow down a tiny bit each frame so you don't fly forever. Press Play.",
+    ["self.vx = self.vx * 0.985","self.vy = self.vy * 0.985"], play=True),
+  S("Car","loop","Set the grip, but hold SPACE for the handbrake - less grip means more sliding! Press Play.",
+    ["Game.grip = 0.12","if key_is_pressed(' '):","    Game.grip = 0.03"], play=True),
+  S("Car","loop","Find the sideways slide, then pull some of it back toward the nose. Press Play - the car grips and follows its nose!",
+    ["self.side = self.vy * self.hx - self.vx * self.hy","self.vx = self.vx + self.hy * self.side * Game.grip","self.vy = self.vy - self.hx * self.side * Game.grip"], play=True),
+  S("Car","loop","Score while you DRIFT: the bigger the sideways slide, the more you score! Press Play - hold Space and steer!",
+    ["if self.side > 3:","    Game.score = Game.score + 1","if self.side < -3:","    Game.score = Game.score + 1"], play=True),
+  S("Car","loop","Keep the car on the road (left and right edges). Press Play.",
+    ["if self.x > 360:","    self.x = 360","if self.x < -360:","    self.x = -360"], play=True),
+  S("Car","loop","Keep the car on the road (top and bottom edges). Press Play.",
+    ["if self.y > 260:","    self.y = 260","if self.y < -260:","    self.y = -260"], play=True),
+  S("Cone","start","Add a Class called Cone to dodge.",
+    ["self.image = sprite('cone.png')","self.scaleX = 22","self.scaleY = 26"]),
+  S("Play","start","Place three cones around the road. Press Play.",
+    ["Game.coneA = Cone()","Game.coneA.x = 180","Game.coneA.y = 120","Game.coneB = Cone()","Game.coneB.x = -200","Game.coneB.y = -80","Game.coneC = Cone()","Game.coneC.x = 60","Game.coneC.y = -180"], play=True),
+  S("Car","loop","Hit a cone = lose a life and restart in the middle. Press Play - dodge them!",
+    ["if get_collision(self, 'Cone'):","    Game.lives = Game.lives - 1","    self.x = 0","    self.y = 0","    self.vx = 0","    self.vy = 0","    if Game.lives < 1:","        Game.dead = True"], play=True),
+  S("Play","start","Add a white label for your drift score and lives.",
+    ["Game.label = text()","Game.label.color = \"white\"","Game.label.y = 250","Game.label.text = 'Drift Score: 0'"], play=True),
+  S("Play","loop","Keep the label updated. Press Play.",
+    ["Game.label.text = 'Drift Score: ' + str(Game.score) + '   Lives: ' + str(Game.lives)"], play=True),
+ ] + GO()})
+
 # ===========================================================================
 # GENERATOR
 # ===========================================================================
@@ -1136,7 +1189,7 @@ EMOJI = {"catch":"\U0001F34E","whack":"\U0001F528","flappy":"\U0001F424","subway
          "doodle":"\U0001F998","shooter":"\U0001F680","heli":"\U0001F681","slice":"\U0001F349",
          "dodge":"☄️","stack":"\U0001F5FC","fishing":"\U0001F3A3","rhythm":"\U0001F3B5",
          "lander":"\U0001F6F8","platformer":"\U0001F3C3‍♂️","cookie":"\U0001F36A",
-         "pacman":"\U0001F60B"}
+         "pacman":"\U0001F60B","drift":"\U0001F3CE"}
 
 HUB_CSS = """
     :root { --brand:#01aefd; --brand-dark:#0294d8; --brand-ink:#0a6299; --brand-tint:#e7f7ff;
