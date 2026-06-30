@@ -47,8 +47,8 @@
       <div class="brand">
         <img class="logo-img sm" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" />
         <span class="brand-sep"></span>
-        <input id="spriteName" class="sprite-name" value="my-art.png" spellcheck="false" autocomplete="off"
-               title="Name your sprite — this becomes the saved file name" aria-label="Sprite file name" />
+        <input id="spriteName" class="sprite-name" value="my-art" spellcheck="false" autocomplete="off"
+               title="Name your sprite — this becomes the saved file name (.png)" aria-label="Sprite file name" />
       </div>
       <div class="top-actions">
         <button id="undoBtn" class="tbtn" title="Undo">↶ Undo</button>
@@ -64,7 +64,7 @@
         <button id="gridBtn" class="tbtn active" title="Show / hide grid">Grid</button>
         <button id="canvasBtn" class="tbtn" title="Change the canvas size">Canvas</button>
         <span class="divider"></span>
-        <button id="exportBtn" class="tbtn primary" title="Export your art as a PNG">Export</button>
+        <button id="exportBtn" class="tbtn primary" title="Download your sprite as a PNG">💾 Save</button>
         <button id="newBtn" class="tbtn" title="Start a new drawing">New</button>
       </div>
     </header>
@@ -113,47 +113,6 @@
         <h2 class="panel-title">Palette</h2>
         <div class="palette" id="palette"></div>
       </aside>
-    </div>
-  </div>
-
-  <!-- ===================== EXPORT SETTINGS MODAL ===================== -->
-  <div id="exportModal" class="modal hidden">
-    <div class="modal-card">
-      <h2>Export Image</h2>
-      <p class="modal-sub">Your drawing is <b id="gridInfo">32 × 32 pixels</b>.<br />
-        Choose the exported image size. <em>This won't change your drawing or pixel size.</em></p>
-
-      <div class="scale-quick">
-        <span>Quick size:</span>
-        <button class="scaleBtn" data-scale="1">1×</button>
-        <button class="scaleBtn" data-scale="2">2×</button>
-        <button class="scaleBtn" data-scale="4">4×</button>
-      </div>
-
-      <div class="export-fields">
-        <label>Width
-          <input type="number" id="exportW" min="1" max="8192" />
-        </label>
-        <span class="x">×</span>
-        <label>Height
-          <input type="number" id="exportH" min="1" max="8192" />
-        </label>
-        <label class="px">px</label>
-      </div>
-
-      <div class="export-fields">
-        <label style="flex:1">File name
-          <input type="text" id="exportName" spellcheck="false" autocomplete="off" />
-        </label>
-      </div>
-
-      <label class="check"><input type="checkbox" id="lockAspect" checked /> Lock aspect ratio</label>
-      <label class="check"><input type="checkbox" id="transparentBg" checked /> Transparent background</label>
-
-      <div class="modal-actions">
-        <button id="cancelExport" class="tbtn">Cancel</button>
-        <button id="downloadBtn" class="tbtn primary">Download PNG</button>
-      </div>
     </div>
   </div>
 

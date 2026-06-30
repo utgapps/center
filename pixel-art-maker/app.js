@@ -30,7 +30,7 @@
   const MAX_GRID = 256;               // safety cap on colorable squares per side
   const DEFAULT_CANVAS = 512;
   const DEFAULT_TILE = 16;
-  const DEFAULT_NAME = "my-art.png";
+  const DEFAULT_NAME = "my-art";
 
   // ---------- State ----------
   const state = {
@@ -453,27 +453,16 @@
     const top = $("spriteName"); if (top && top.value !== state.name) top.value = state.name;
   }
 
-  function openExport() {
-    $("gridInfo").textContent = `${state.w} × ${state.h} pixels (each ${state.tile}px) on a ${state.canvasW} × ${state.canvasH} canvas`;
-    $("exportW").value = state.exportW;
-    $("exportH").value = state.exportH;
-    $("exportName").value = state.name;
-    $("exportModal").classList.remove("hidden");
-  }
-  function closeExport() { $("exportModal").classList.add("hidden"); }
-
+  // Save = download a transparent PNG straight away (no popup). The image is the
+  // canvas size; the file name is the editable sprite title (with .png added).
   function doDownload() {
-    const ew = clamp(parseInt($("exportW").value, 10) || state.canvasW, 1, 8192);
-    const eh = clamp(parseInt($("exportH").value, 10) || state.canvasH, 1, 8192);
-    state.exportW = ew; state.exportH = eh;
-    setName($("exportName").value);             // the modal field can rename too
-    const transparent = $("transparentBg").checked;
+    const ew = clamp(state.exportW || state.canvasW, 1, 8192);
+    const eh = clamp(state.exportH || state.canvasH, 1, 8192);
 
     const off = document.createElement("canvas");
     off.width = ew; off.height = eh;
     const octx = off.getContext("2d");
     octx.imageSmoothingEnabled = false;
-    if (!transparent) { octx.fillStyle = "#ffffff"; octx.fillRect(0, 0, ew, eh); }
 
     const cw = ew / state.w, ch = eh / state.h;
     for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) {
@@ -488,7 +477,6 @@
     a.download = fileName();
     a.href = off.toDataURL("image/png");
     a.click();
-    closeExport();
   }
 
   // ============================================================
@@ -621,33 +609,13 @@
       $("gridBtn").classList.toggle("active", state.showGrid);
       render();
     });
-    $("exportBtn").addEventListener("click", openExport);
+    $("exportBtn").addEventListener("click", doDownload);
     $("canvasBtn").addEventListener("click", openCanvas);
     $("newBtn").addEventListener("click", () => { if (confirm("Start a new drawing? Your current one will be cleared.")) goToWelcome(); });
 
     colorInput.addEventListener("input", () => { selectColor(colorInput.value); if (state.tool === "eraser") selectTool("pencil"); });
 
     $("spriteName").addEventListener("input", () => { state.name = $("spriteName").value; });
-
-    $("cancelExport").addEventListener("click", closeExport);
-    $("downloadBtn").addEventListener("click", doDownload);
-    $("exportModal").addEventListener("click", (e) => { if (e.target.id === "exportModal") closeExport(); });
-    document.querySelectorAll(".scaleBtn").forEach(b => b.addEventListener("click", () => {
-      const s = parseInt(b.dataset.scale, 10);
-      $("exportW").value = state.canvasW * s;
-      $("exportH").value = state.canvasH * s;
-    }));
-    const baseRatio = () => state.w / state.h;
-    $("exportW").addEventListener("input", () => {
-      if (!$("lockAspect").checked) return;
-      const v = parseInt($("exportW").value, 10);
-      if (Number.isFinite(v)) $("exportH").value = Math.round(v / baseRatio());
-    });
-    $("exportH").addEventListener("input", () => {
-      if (!$("lockAspect").checked) return;
-      const v = parseInt($("exportH").value, 10);
-      if (Number.isFinite(v)) $("exportW").value = Math.round(v * baseRatio());
-    });
 
     // canvas size modal
     let canvasRatio = 1;

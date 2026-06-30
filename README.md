@@ -15,7 +15,8 @@ A kid-friendly, Piskel-style pixel art editor that runs entirely in the browser 
 - The **picture** is a fixed-size image in real pixels (default **512 × 512**), which is also the default saved (export) size.
 - The **Pixel size** buttons — **8px / 16px / 32px / 64px** — set how many real pixels make up one drawing pixel (one colorable block). So on a 512px picture: 8px → 64×64 grid, 16px → 32×32, 32px → 16×16, 64px → 8×8 (chunkier). Bigger pixel size = chunkier art.
 - (Note: "8-bit / 16-bit" is *color depth*, not size — that's why this control is called **pixel size**, not "bit". The number of pixels across is the **resolution** / grid.)
-- Changing the pixel size **never changes the picture or export size** — it only changes how chunky the pixels are (and resamples your art to fit). The saved-image size changes only through the **Save Picture** menu or a query string.
+- Changing the pixel size **never changes the picture or export size** — it only changes how chunky the pixels are (and resamples your art to fit). The saved-image size matches the canvas size (change it with the **Canvas** button or a query string).
+- **Save** downloads a transparent PNG straight away — no dialog. The file name is the editable sprite title in the toolbar (`.png` is added automatically).
 
 #### Query strings
 Open the editor pre-configured by adding parameters to the URL:
