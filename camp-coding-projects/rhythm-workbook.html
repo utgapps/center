@@ -9,6 +9,10 @@
                 cursor:pointer; box-shadow:0 6px 18px rgba(1,174,253,.4); text-decoration:none; }
     .printbtn:hover { background:#0294d8; }
     @media print { .printbtn { display:none !important; } }
+    /* Print-to-PDF is a class-code permission: hide the button, and blank the
+       printed page (so Ctrl+P can't bypass it) unless the code grants it. */
+    html:not(.utg-can-print) .printbtn { display:none !important; }
+    @media print { html:not(.utg-can-print) body { display:none !important; } }
     .page { page-break-inside: avoid; break-inside: avoid; padding: 4px 2px 8px; margin-bottom: 7mm; }
     .intro { page-break-inside: avoid; break-inside: avoid; }
     .intro h1 { font-size: 32px; margin: 0 0 8px; }

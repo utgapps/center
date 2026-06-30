@@ -11,7 +11,10 @@ The home page is locked behind a **4-letter class code** so kids can't use the t
 ```
 
 - **`enabled`** — `true` = the code works now; `false` = locked. To lock a class out after class / at home, set its code to `false` and push; to let them in, set it `true`.
-- **`tools`** — `"all"`, or a list of `"pixel-art"` / `"camp"`, to control *which* tools that code reveals.
+- **`tools`** — `"all"`, or a list of `"pixel-art"` / `"camp"`, to control *which* resources that code reveals.
+- **`print`** — `true` lets that code use **Print to PDF** on the coding workbooks; leave it out / `false` to block printing. (When blocked, the button is hidden *and* Ctrl+P prints a blank page, so it can't be bypassed.)
+
+Out of the box: **`QWER`** = students (all resources, **no** printing), **`ASDF`** = teacher (all resources, **can** print PDFs).
 
 Entering a valid, enabled code reveals the matching resources and remembers it on that device. Tool pages (and the games/guides) check the code too, so typing a direct URL at home still bounces back to the gate. It's a simple gate, **not real security** — the codes are public in the repo; it just keeps kids out of the resources outside class. (Browsers may cache `class-codes.js` for a few minutes, so a lock can take a little while to take effect.)
 
