@@ -24,7 +24,7 @@
     "#19c37d", "#00c2d1", "#3b82f6", "#6c63ff",
     "#b14df0", "#ff8fc7", "#ffc9a8", "#7cf5d6",
   ];
-  const TILES = [8, 16, 32, 64];      // the four "bit" tile sizes
+  const TILES = [4, 8, 16, 32, 64];   // pixel-tile sizes (real px per drawing pixel)
   const MIN_PIXEL = 3;
   const MAX_PIXEL = 48;
   const MAX_GRID = 256;               // safety cap on colorable squares per side

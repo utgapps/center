@@ -84,7 +84,7 @@ html, body {
 }
 
 .size-presets {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 22px;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 22px;
 }
 .preset {
   font-family: var(--font);
