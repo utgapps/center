@@ -12,22 +12,22 @@
   <div id="welcome" class="welcome">
     <div class="welcome-card">
       <h1 class="logo">🎨 Pixel Art Maker</h1>
-      <p class="tagline">Make awesome pixel art! Pick a canvas size to start.</p>
+      <p class="tagline">How chunky do you want your pixels? Pick a tile size!</p>
 
       <div class="size-presets">
-        <button class="preset" data-w="8"  data-h="8">🐣<span>8-bit</span><small>8 × 8</small></button>
-        <button class="preset" data-w="16" data-h="16">🙂<span>16-bit</span><small>16 × 16</small></button>
-        <button class="preset selected" data-w="32" data-h="32">🌟<span>32-bit</span><small>32 × 32</small></button>
-        <button class="preset" data-w="64" data-h="64">🚀<span>64-bit</span><small>64 × 64</small></button>
+        <button class="preset" data-tile="8">🧩<span>8-bit</span><small>8px tiles</small></button>
+        <button class="preset selected" data-tile="16">🟦<span>16-bit</span><small>16px tiles</small></button>
+        <button class="preset" data-tile="32">⬛<span>32-bit</span><small>32px tiles</small></button>
+        <button class="preset" data-tile="64">🔲<span>64-bit</span><small>64px tiles</small></button>
       </div>
 
       <div class="custom-size">
-        <label>Or your own size:</label>
+        <label>Picture size (the saved image):</label>
         <div class="custom-row">
-          <input type="number" id="customW" min="2" max="128" value="32" />
-          <span>×</span>
-          <input type="number" id="customH" min="2" max="128" value="32" />
+          <input type="number" id="canvasSize" min="32" max="2048" step="8" value="512" />
+          <span>px</span>
         </div>
+        <p class="grid-hint" id="welcomeHint">That gives you a 32 × 32 grid of tiles to color.</p>
       </div>
 
       <button id="startBtn" class="start-btn">✏️ Start Drawing!</button>
@@ -44,12 +44,12 @@
         <button id="undoBtn" class="tbtn" title="Undo">↶ Undo</button>
         <button id="redoBtn" class="tbtn" title="Redo">↷ Redo</button>
         <span class="divider"></span>
-        <span class="res-title">Pixels:</span>
+        <span class="res-title">Pixel size:</span>
         <div class="res-group">
-          <button class="resBtn" data-res="8"  title="8 × 8 canvas">8-bit<small>8×8</small></button>
-          <button class="resBtn" data-res="16" title="16 × 16 canvas">16-bit<small>16×16</small></button>
-          <button class="resBtn" data-res="32" title="32 × 32 canvas">32-bit<small>32×32</small></button>
-          <button class="resBtn" data-res="64" title="64 × 64 canvas">64-bit<small>64×64</small></button>
+          <button class="tileBtn" data-tile="8"  title="Every 8 px = 1 tile">8-bit<small>64×64</small></button>
+          <button class="tileBtn" data-tile="16" title="Every 16 px = 1 tile">16-bit<small>32×32</small></button>
+          <button class="tileBtn" data-tile="32" title="Every 32 px = 1 tile">32-bit<small>16×16</small></button>
+          <button class="tileBtn" data-tile="64" title="Every 64 px = 1 tile">64-bit<small>8×8</small></button>
         </div>
         <button id="gridBtn" class="tbtn active" title="Show / hide grid">▦ Grid</button>
         <span class="divider"></span>
@@ -89,6 +89,7 @@
         <div class="canvas-wrap" id="canvasWrap">
           <canvas id="canvas"></canvas>
         </div>
+        <div class="status-bar" id="statusBar"></div>
       </main>
 
       <!-- Colors -->
@@ -108,15 +109,14 @@
   <div id="exportModal" class="modal hidden">
     <div class="modal-card">
       <h2>💾 Save Your Picture</h2>
-      <p class="modal-sub">Your drawing is <b id="gridInfo">32 × 32</b> pixels.<br />
-        Choose how big the saved picture should be. <em>(This does not change your drawing!)</em></p>
+      <p class="modal-sub">Your drawing is <b id="gridInfo">32 × 32 tiles</b>.<br />
+        Choose how big the saved picture should be. <em>(This does not change your drawing or tile size!)</em></p>
 
       <div class="scale-quick">
         <span>Quick size:</span>
         <button class="scaleBtn" data-scale="1">1×</button>
-        <button class="scaleBtn" data-scale="8">8×</button>
-        <button class="scaleBtn" data-scale="16">16×</button>
-        <button class="scaleBtn" data-scale="32">32×</button>
+        <button class="scaleBtn" data-scale="2">2×</button>
+        <button class="scaleBtn" data-scale="4">4×</button>
       </div>
 
       <div class="export-fields">

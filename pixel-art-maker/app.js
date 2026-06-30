@@ -1,5 +1,16 @@
 /* ============================================================
    🎨 Pixel Art Maker — a kid-friendly Piskel-style editor
+
+   Model
+   -----
+   • CANVAS  : the picture, a fixed size in real pixels (canvasW × canvasH).
+               This is also the default saved-picture (export) size.
+   • TILE    : how many real pixels make up one colorable block (8/16/32/64).
+               "8-bit" = every 8 px is one tile. Bigger number = chunkier.
+   • GRID    : the colorable squares = round(canvas / tile). DERIVED.
+   • EXPORT  : the saved image size. Defaults to the canvas size, and only
+               changes through the Save Picture menu or a query string —
+               never by changing the tile size.
    ============================================================ */
 
 (() => {
@@ -13,20 +24,26 @@
     "#19c37d", "#00c2d1", "#3b82f6", "#6c63ff",
     "#b14df0", "#ff8fc7", "#ffc9a8", "#7cf5d6",
   ];
-  const MIN_PIXEL = 4;
+  const TILES = [8, 16, 32, 64];      // the four "bit" tile sizes
+  const MIN_PIXEL = 3;
   const MAX_PIXEL = 48;
-  const DEFAULT_EXPORT_SCALE = 16; // saved picture = grid * 16 by default
+  const MAX_GRID = 256;               // safety cap on colorable squares per side
+  const DEFAULT_CANVAS = 512;
+  const DEFAULT_TILE = 16;
 
   // ---------- State ----------
   const state = {
-    w: 32,
-    h: 32,
-    pixelSize: 16,        // on-screen size of each cell (zoom only — never the export size)
-    data: [],             // flat array, length w*h, each entry hex string or null
+    canvasW: DEFAULT_CANVAS,   // picture size in real pixels
+    canvasH: DEFAULT_CANVAS,
+    tile: DEFAULT_TILE,        // real pixels per colorable tile
+    w: 32,                     // grid columns (derived = round(canvasW/tile))
+    h: 32,                     // grid rows
+    pixelSize: 16,             // on-screen size of one tile (display fit only)
+    data: [],                  // flat array length w*h, hex string or null
     tool: "pencil",
     color: "#ff4d6d",
     showGrid: true,
-    exportW: null,        // saved-picture width in real pixels (independent of pixelSize)
+    exportW: null,             // saved-picture size (defaults to canvas size)
     exportH: null,
     undo: [],
     redo: [],
@@ -38,27 +55,45 @@
   const editor = $("editor");
   const canvas = $("canvas");
   const ctx = canvas.getContext("2d");
-  const canvasWrap = $("canvasWrap");
   const paletteEl = $("palette");
   const currentColorEl = $("currentColor");
   const colorInput = $("colorInput");
 
   // ============================================================
-  //  Setup helpers
+  //  Helpers
   // ============================================================
   function idx(x, y) { return y * state.w + x; }
   function inBounds(x, y) { return x >= 0 && y >= 0 && x < state.w && y < state.h; }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
   function blankData(w, h) { return new Array(w * h).fill(null); }
 
+  function gridFor(canvasW, canvasH, tile) {
+    return {
+      w: clamp(Math.max(1, Math.round(canvasW / tile)), 1, MAX_GRID),
+      h: clamp(Math.max(1, Math.round(canvasH / tile)), 1, MAX_GRID),
+    };
+  }
+
   function fitPixelSize() {
-    // Pick an on-screen pixel size that fits the available canvas area.
     const area = document.querySelector(".canvas-area");
     const availW = (area ? area.clientWidth : 600) - 60;
-    const availH = (area ? area.clientHeight : 600) - 60;
+    const availH = (area ? area.clientHeight : 600) - 80;
     const size = Math.floor(Math.min(availW / state.w, availH / state.h));
     return clamp(size, MIN_PIXEL, MAX_PIXEL);
+  }
+
+  // nearest-neighbour resample of the current grid into a new grid
+  function resampleTo(newW, newH) {
+    if (state.data.length !== state.w * state.h) return blankData(newW, newH);
+    const next = blankData(newW, newH);
+    for (let ny = 0; ny < newH; ny++) {
+      for (let nx = 0; nx < newW; nx++) {
+        const sx = Math.min(state.w - 1, Math.floor(nx * state.w / newW));
+        const sy = Math.min(state.h - 1, Math.floor(ny * state.h / newH));
+        next[ny * newW + nx] = state.data[sy * state.w + sx];
+      }
+    }
+    return next;
   }
 
   // ============================================================
@@ -72,23 +107,18 @@
 
   function drawChecker() {
     const ps = state.pixelSize;
-    const c = Math.max(4, Math.floor(ps / 2));
     for (let y = 0; y < state.h; y++) {
       for (let x = 0; x < state.w; x++) {
         ctx.fillStyle = ((x + y) % 2 === 0) ? "#ffffff" : "#eef0f3";
         ctx.fillRect(x * ps, y * ps, ps, ps);
-        // checker inside each empty cell for a "transparent" look
       }
     }
-    // subtle checker overlay independent of cell color is skipped for clarity
-    void c;
   }
 
   function render(preview) {
     const ps = state.pixelSize;
     drawChecker();
 
-    // committed pixels
     for (let y = 0; y < state.h; y++) {
       for (let x = 0; x < state.w; x++) {
         const col = state.data[idx(x, y)];
@@ -96,21 +126,16 @@
       }
     }
 
-    // preview pixels (line / box / circle / move while dragging)
     if (preview) {
       for (const p of preview) {
         if (!inBounds(p.x, p.y)) continue;
-        if (p.color === null) {
-          // erase preview -> show checker cell
-          ctx.fillStyle = ((p.x + p.y) % 2 === 0) ? "#ffffff" : "#eef0f3";
-        } else {
-          ctx.fillStyle = p.color;
-        }
+        ctx.fillStyle = p.color === null
+          ? (((p.x + p.y) % 2 === 0) ? "#ffffff" : "#eef0f3")
+          : p.color;
         ctx.fillRect(p.x * ps, p.y * ps, ps, ps);
       }
     }
 
-    // grid
     if (state.showGrid && ps >= 6) {
       ctx.strokeStyle = "rgba(58,44,70,.10)";
       ctx.lineWidth = 1;
@@ -122,14 +147,25 @@
   }
 
   // ============================================================
-  //  History (undo / redo)
+  //  History (undo / redo) — snapshots size + tile too
   // ============================================================
-  function snapshot() { return { w: state.w, h: state.h, data: state.data.slice() }; }
+  function snapshot() {
+    return {
+      w: state.w, h: state.h, tile: state.tile,
+      canvasW: state.canvasW, canvasH: state.canvasH,
+      exportW: state.exportW, exportH: state.exportH,
+      data: state.data.slice(),
+    };
+  }
   function restore(s) {
-    state.w = s.w; state.h = s.h; state.data = s.data.slice();
+    state.w = s.w; state.h = s.h; state.tile = s.tile;
+    state.canvasW = s.canvasW; state.canvasH = s.canvasH;
+    state.exportW = s.exportW; state.exportH = s.exportH;
+    state.data = s.data.slice();
     state.pixelSize = fitPixelSize();
     resizeCanvas();
-    updateResButtons();
+    updateTileButtons();
+    updateStatus();
   }
   function pushUndo() {
     state.undo.push(snapshot());
@@ -137,18 +173,8 @@
     state.redo.length = 0;
     updateHistoryButtons();
   }
-  function undo() {
-    if (!state.undo.length) return;
-    state.redo.push(snapshot());
-    restore(state.undo.pop());
-    updateHistoryButtons();
-  }
-  function redo() {
-    if (!state.redo.length) return;
-    state.undo.push(snapshot());
-    restore(state.redo.pop());
-    updateHistoryButtons();
-  }
+  function undo() { if (state.undo.length) { state.redo.push(snapshot()); restore(state.undo.pop()); updateHistoryButtons(); } }
+  function redo() { if (state.redo.length) { state.undo.push(snapshot()); restore(state.redo.pop()); updateHistoryButtons(); } }
   function updateHistoryButtons() {
     $("undoBtn").disabled = state.undo.length === 0;
     $("redoBtn").disabled = state.redo.length === 0;
@@ -157,12 +183,9 @@
   // ============================================================
   //  Drawing primitives
   // ============================================================
-  function setPixel(x, y, color) {
-    if (inBounds(x, y)) state.data[idx(x, y)] = color;
-  }
+  function setPixel(x, y, color) { if (inBounds(x, y)) state.data[idx(x, y)] = color; }
 
   function linePoints(x0, y0, x1, y1) {
-    // Bresenham
     const pts = [];
     let dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
     let sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
@@ -176,7 +199,6 @@
     }
     return pts;
   }
-
   function rectPoints(x0, y0, x1, y1) {
     const pts = [];
     const xa = Math.min(x0, x1), xb = Math.max(x0, x1);
@@ -185,9 +207,7 @@
     for (let y = ya; y <= yb; y++) { pts.push({ x: xa, y }); pts.push({ x: xb, y }); }
     return pts;
   }
-
   function ellipsePoints(x0, y0, x1, y1) {
-    // midpoint ellipse over the bounding box
     const xa = Math.min(x0, x1), xb = Math.max(x0, x1);
     const ya = Math.min(y0, y1), yb = Math.max(y0, y1);
     const rx = (xb - xa) / 2, ry = (yb - ya) / 2;
@@ -200,7 +220,6 @@
     }
     return pts;
   }
-
   function floodFill(sx, sy, newColor) {
     const target = state.data[idx(sx, sy)];
     if (target === newColor) return;
@@ -217,9 +236,7 @@
   // ============================================================
   //  Pointer interaction
   // ============================================================
-  let drawing = false;
-  let startCell = null;
-  let lastCell = null;
+  let drawing = false, startCell = null, lastCell = null;
 
   function cellFromEvent(e) {
     const rect = canvas.getBoundingClientRect();
@@ -227,60 +244,36 @@
     const y = Math.floor((e.clientY - rect.top) / (rect.height / state.h));
     return { x: clamp(x, 0, state.w - 1), y: clamp(y, 0, state.h - 1) };
   }
-
-  function paintColor() {
-    return state.tool === "eraser" ? null : state.color;
-  }
+  function paintColor() { return state.tool === "eraser" ? null : state.color; }
 
   function onDown(e) {
     e.preventDefault();
     const cell = cellFromEvent(e);
     const t = state.tool;
-
     if (t === "picker") {
       const col = state.data[idx(cell.x, cell.y)];
       if (col) selectColor(col);
       return;
     }
-
-    drawing = true;
-    startCell = cell;
-    lastCell = cell;
-    pushUndo();
-
-    if (t === "pencil" || t === "eraser") {
-      setPixel(cell.x, cell.y, paintColor());
-      render();
-    } else if (t === "mirror") {
-      setPixel(cell.x, cell.y, paintColor());
-      setPixel(state.w - 1 - cell.x, cell.y, paintColor());
-      render();
-    } else if (t === "fill") {
-      floodFill(cell.x, cell.y, paintColor());
-      render();
-      drawing = false; // single action
-    }
-    // line / rect / ellipse / move handled on move + up
+    drawing = true; startCell = cell; lastCell = cell; pushUndo();
+    if (t === "pencil" || t === "eraser") { setPixel(cell.x, cell.y, paintColor()); render(); }
+    else if (t === "mirror") { setPixel(cell.x, cell.y, paintColor()); setPixel(state.w - 1 - cell.x, cell.y, paintColor()); render(); }
+    else if (t === "fill") { floodFill(cell.x, cell.y, paintColor()); render(); drawing = false; }
   }
-
   function onMove(e) {
     if (!drawing) return;
     e.preventDefault();
     const cell = cellFromEvent(e);
     const t = state.tool;
-
     if (t === "pencil" || t === "eraser") {
-      // connect with a line so fast strokes don't skip
       for (const p of linePoints(lastCell.x, lastCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
-      lastCell = cell;
-      render();
+      lastCell = cell; render();
     } else if (t === "mirror") {
       for (const p of linePoints(lastCell.x, lastCell.y, cell.x, cell.y)) {
         setPixel(p.x, p.y, paintColor());
         setPixel(state.w - 1 - p.x, p.y, paintColor());
       }
-      lastCell = cell;
-      render();
+      lastCell = cell; render();
     } else if (t === "line") {
       render(linePoints(startCell.x, startCell.y, cell.x, cell.y).map(p => ({ ...p, color: paintColor() })));
     } else if (t === "rect") {
@@ -291,46 +284,32 @@
       render(movedPreview(cell.x - startCell.x, cell.y - startCell.y));
     }
   }
-
   function onUp(e) {
     if (!drawing) return;
     const cell = cellFromEvent(e);
     const t = state.tool;
-
-    if (t === "line") {
-      for (const p of linePoints(startCell.x, startCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
-    } else if (t === "rect") {
-      for (const p of rectPoints(startCell.x, startCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
-    } else if (t === "ellipse") {
-      for (const p of ellipsePoints(startCell.x, startCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
-    } else if (t === "move") {
-      commitMove(cell.x - startCell.x, cell.y - startCell.y);
-    }
-    drawing = false;
-    render();
+    if (t === "line") for (const p of linePoints(startCell.x, startCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
+    else if (t === "rect") for (const p of rectPoints(startCell.x, startCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
+    else if (t === "ellipse") for (const p of ellipsePoints(startCell.x, startCell.y, cell.x, cell.y)) setPixel(p.x, p.y, paintColor());
+    else if (t === "move") commitMove(cell.x - startCell.x, cell.y - startCell.y);
+    drawing = false; render();
   }
 
-  // Move tool — wrap-around shift so nothing is ever lost
   function movedPreview(dx, dy) {
     const out = [];
-    for (let y = 0; y < state.h; y++) {
-      for (let x = 0; x < state.w; x++) {
-        const col = state.data[idx(x, y)];
-        const nx = ((x + dx) % state.w + state.w) % state.w;
-        const ny = ((y + dy) % state.h + state.h) % state.h;
-        out.push({ x: nx, y: ny, color: col });
-      }
+    for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) {
+      const nx = ((x + dx) % state.w + state.w) % state.w;
+      const ny = ((y + dy) % state.h + state.h) % state.h;
+      out.push({ x: nx, y: ny, color: state.data[idx(x, y)] });
     }
     return out;
   }
   function commitMove(dx, dy) {
     const next = blankData(state.w, state.h);
-    for (let y = 0; y < state.h; y++) {
-      for (let x = 0; x < state.w; x++) {
-        const nx = ((x + dx) % state.w + state.w) % state.w;
-        const ny = ((y + dy) % state.h + state.h) % state.h;
-        next[idx(nx, ny)] = state.data[idx(x, y)];
-      }
+    for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) {
+      const nx = ((x + dx) % state.w + state.w) % state.w;
+      const ny = ((y + dy) % state.h + state.h) % state.h;
+      next[idx(nx, ny)] = state.data[idx(x, y)];
     }
     state.data = next;
   }
@@ -341,44 +320,33 @@
   function flipH() {
     pushUndo();
     const next = blankData(state.w, state.h);
-    for (let y = 0; y < state.h; y++)
-      for (let x = 0; x < state.w; x++)
-        next[idx(state.w - 1 - x, y)] = state.data[idx(x, y)];
+    for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) next[idx(state.w - 1 - x, y)] = state.data[idx(x, y)];
     state.data = next; render();
   }
   function flipV() {
     pushUndo();
     const next = blankData(state.w, state.h);
-    for (let y = 0; y < state.h; y++)
-      for (let x = 0; x < state.w; x++)
-        next[idx(x, state.h - 1 - y)] = state.data[idx(x, y)];
+    for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) next[idx(x, state.h - 1 - y)] = state.data[idx(x, y)];
     state.data = next; render();
   }
   function rotate(dir) {
-    // dir: "L" or "R". Swaps width/height.
     pushUndo();
     const nw = state.h, nh = state.w;
     const next = new Array(nw * nh).fill(null);
-    for (let y = 0; y < state.h; y++) {
-      for (let x = 0; x < state.w; x++) {
-        let nx, ny;
-        if (dir === "R") { nx = state.h - 1 - y; ny = x; }
-        else { nx = y; ny = state.w - 1 - x; }
-        next[ny * nw + nx] = state.data[idx(x, y)];
-      }
+    for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) {
+      let nx, ny;
+      if (dir === "R") { nx = state.h - 1 - y; ny = x; } else { nx = y; ny = state.w - 1 - x; }
+      next[ny * nw + nx] = state.data[idx(x, y)];
     }
     state.w = nw; state.h = nh; state.data = next;
-    // rotating swaps width/height, so swap the export size to keep the same shape
-    const t = state.exportW; state.exportW = state.exportH; state.exportH = t;
+    // rotating swaps the picture's width/height too
+    let t = state.canvasW; state.canvasW = state.canvasH; state.canvasH = t;
+    t = state.exportW; state.exportW = state.exportH; state.exportH = t;
     state.pixelSize = fitPixelSize();
     resizeCanvas();
-    updateResButtons();
+    updateStatus();
   }
-  function clearAll() {
-    pushUndo();
-    state.data = blankData(state.w, state.h);
-    render();
-  }
+  function clearAll() { pushUndo(); state.data = blankData(state.w, state.h); render(); }
 
   // ============================================================
   //  Colors
@@ -391,7 +359,7 @@
       if (col) s.style.background = col;
       s.title = col === null ? "Transparent (eraser)" : col;
       s.addEventListener("click", () => {
-        if (col === null) { selectTool("eraser"); }
+        if (col === null) selectTool("eraser");
         else { selectColor(col); selectTool(state.tool === "eraser" ? "pencil" : state.tool); }
         markSwatch(col);
       });
@@ -399,9 +367,7 @@
       paletteEl.appendChild(s);
     });
   }
-  function markSwatch(col) {
-    [...paletteEl.children].forEach(s => s.classList.toggle("selected", s._col === col));
-  }
+  function markSwatch(col) { [...paletteEl.children].forEach(s => s.classList.toggle("selected", s._col === col)); }
   function selectColor(col) {
     state.color = col;
     currentColorEl.style.background = col;
@@ -414,48 +380,45 @@
   // ============================================================
   function selectTool(tool) {
     state.tool = tool;
-    document.querySelectorAll(".tool[data-tool]").forEach(b =>
-      b.classList.toggle("selected", b.dataset.tool === tool));
+    document.querySelectorAll(".tool[data-tool]").forEach(b => b.classList.toggle("selected", b.dataset.tool === tool));
   }
 
   // ============================================================
-  //  Resolution — the pixels-across of the canvas (8 / 16 / 32 / 64).
-  //  Changing it resamples the art but NEVER changes the export size;
-  //  export size only changes through the Save Picture menu / query string.
+  //  Tile size — "the bit buttons". Changes chunkiness only;
+  //  the canvas / export size is left untouched.
   // ============================================================
-  function setResolution(n) {
-    n = clamp(n | 0, 2, 128);
-    if (n === state.w && n === state.h) { updateResButtons(); return; }
+  function setTile(tile) {
+    if (tile === state.tile) { updateTileButtons(); return; }
     pushUndo();
-    const next = new Array(n * n).fill(null);
-    for (let ny = 0; ny < n; ny++) {
-      for (let nx = 0; nx < n; nx++) {
-        const sx = Math.min(state.w - 1, Math.floor(nx * state.w / n));
-        const sy = Math.min(state.h - 1, Math.floor(ny * state.h / n));
-        next[ny * n + nx] = state.data[sy * state.w + sx];
-      }
-    }
-    state.w = n; state.h = n; state.data = next;
+    state.tile = tile;
+    const g = gridFor(state.canvasW, state.canvasH, tile);
+    state.data = resampleTo(g.w, g.h);
+    state.w = g.w; state.h = g.h;
     state.pixelSize = fitPixelSize();
     resizeCanvas();
-    updateResButtons();
-    // export size deliberately left untouched
+    updateTileButtons();
+    updateStatus();
+    // export size deliberately unchanged
   }
-  function updateResButtons() {
-    document.querySelectorAll(".resBtn").forEach(b =>
-      b.classList.toggle("active", parseInt(b.dataset.res, 10) === state.w && state.w === state.h));
+  function updateTileButtons() {
+    document.querySelectorAll(".tileBtn").forEach(b => {
+      const n = parseInt(b.dataset.tile, 10);
+      b.classList.toggle("active", n === state.tile);
+      const g = gridFor(state.canvasW, state.canvasH, n);
+      const small = b.querySelector("small");
+      if (small) small.textContent = `${g.w}×${g.h}`;
+    });
+  }
+  function updateStatus() {
+    const el = $("statusBar");
+    if (el) el.textContent = `🖼️ ${state.canvasW}×${state.canvasH} picture · ▦ ${state.w}×${state.h} tiles (${state.tile}px each)`;
   }
 
   // ============================================================
   //  Export
   // ============================================================
-  function syncExportToGridDefault() {
-    state.exportW = state.w * DEFAULT_EXPORT_SCALE;
-    state.exportH = state.h * DEFAULT_EXPORT_SCALE;
-  }
-
   function openExport() {
-    $("gridInfo").textContent = `${state.w} × ${state.h}`;
+    $("gridInfo").textContent = `${state.w} × ${state.h} tiles on a ${state.canvasW} × ${state.canvasH} picture`;
     $("exportW").value = state.exportW;
     $("exportH").value = state.exportH;
     $("exportModal").classList.remove("hidden");
@@ -463,8 +426,8 @@
   function closeExport() { $("exportModal").classList.add("hidden"); }
 
   function doDownload() {
-    const ew = clamp(parseInt($("exportW").value, 10) || state.w, 1, 8192);
-    const eh = clamp(parseInt($("exportH").value, 10) || state.h, 1, 8192);
+    const ew = clamp(parseInt($("exportW").value, 10) || state.canvasW, 1, 8192);
+    const eh = clamp(parseInt($("exportH").value, 10) || state.canvasH, 1, 8192);
     state.exportW = ew; state.exportH = eh;
     const transparent = $("transparentBg").checked;
 
@@ -472,19 +435,14 @@
     off.width = ew; off.height = eh;
     const octx = off.getContext("2d");
     octx.imageSmoothingEnabled = false;
-
     if (!transparent) { octx.fillStyle = "#ffffff"; octx.fillRect(0, 0, ew, eh); }
 
     const cw = ew / state.w, ch = eh / state.h;
-    for (let y = 0; y < state.h; y++) {
-      for (let x = 0; x < state.w; x++) {
-        const col = state.data[idx(x, y)];
-        if (col) {
-          octx.fillStyle = col;
-          // +1 avoids hairline gaps from fractional cell sizes
-          octx.fillRect(Math.floor(x * cw), Math.floor(y * ch),
-            Math.ceil(cw) + 1, Math.ceil(ch) + 1);
-        }
+    for (let y = 0; y < state.h; y++) for (let x = 0; x < state.w; x++) {
+      const col = state.data[idx(x, y)];
+      if (col) {
+        octx.fillStyle = col;
+        octx.fillRect(Math.floor(x * cw), Math.floor(y * ch), Math.ceil(cw) + 1, Math.ceil(ch) + 1);
       }
     }
 
@@ -498,127 +456,120 @@
   // ============================================================
   //  Start / New
   // ============================================================
-  function startEditor(w, h, opts = {}) {
-    state.w = clamp(w | 0, 2, 128);
-    state.h = clamp(h | 0, 2, 128);
+  function startEditor(canvasW, canvasH, opts = {}) {
+    state.canvasW = clamp(canvasW | 0, 8, 4096);
+    state.canvasH = clamp(canvasH | 0, 8, 4096);
+    state.tile = TILES.includes(opts.tile) ? opts.tile : (opts.tile ? clamp(opts.tile | 0, 1, 256) : DEFAULT_TILE);
+
+    const g = gridFor(state.canvasW, state.canvasH, state.tile);
+    state.w = g.w; state.h = g.h;
     state.data = blankData(state.w, state.h);
     state.undo.length = 0; state.redo.length = 0;
 
-    // export size: query string wins, otherwise default scale
-    if (opts.exportW || opts.exportH) {
-      state.exportW = clamp((opts.exportW || opts.exportH) | 0, 1, 8192);
-      state.exportH = clamp((opts.exportH || opts.exportW) | 0, 1, 8192);
-    } else {
-      syncExportToGridDefault();
-    }
+    // export size: query string wins, otherwise = the picture size
+    state.exportW = opts.exportW ? clamp(opts.exportW | 0, 1, 8192) : state.canvasW;
+    state.exportH = opts.exportH ? clamp(opts.exportH | 0, 1, 8192) : state.canvasH;
 
     welcome.classList.add("hidden");
     editor.classList.remove("hidden");
-    // measure AFTER the editor is visible, or the canvas area has zero size
-    state.pixelSize = fitPixelSize();
+    state.pixelSize = fitPixelSize();   // measure after the editor is visible
     resizeCanvas();
-    updateResButtons();
+    updateTileButtons();
+    updateStatus();
     updateHistoryButtons();
     selectColor(state.color);
     selectTool("pencil");
   }
-
-  function goToWelcome() {
-    editor.classList.add("hidden");
-    welcome.classList.remove("hidden");
-  }
+  function goToWelcome() { editor.classList.add("hidden"); welcome.classList.remove("hidden"); }
 
   // ============================================================
   //  Query string
-  //    ?w=32&h=32     -> canvas grid size (cells)
-  //    ?ew=512&eh=512 -> saved-picture size in real pixels
-  //    ?export=512    -> shorthand for square export size
-  //    ?editor=1      -> skip the welcome screen and open the editor
+  //    ?canvas=512        picture size in real px (square)  [alias: size]
+  //    ?cw=640&ch=320     non-square picture size
+  //    ?tile=8            tile size (8/16/32/64) — the "bit" value
+  //    ?ew=1024&eh=1024   saved-picture size override (else = picture size)
+  //    ?export=1024       shorthand square export override
+  //    ?editor=1          skip the welcome screen
   // ============================================================
   function readQuery() {
     const q = new URLSearchParams(location.search);
     const num = (k) => { const v = parseInt(q.get(k), 10); return Number.isFinite(v) ? v : null; };
-
-    const w = num("w") ?? num("gw");
-    const h = num("h") ?? num("gh");
-    let ew = num("ew");
-    let eh = num("eh");
+    const canvas = num("canvas") ?? num("size");
+    const cw = num("cw") ?? canvas;
+    const ch = num("ch") ?? canvas;
+    const tile = num("tile");
+    let ew = num("ew"), eh = num("eh");
     const exp = num("export");
     if (exp != null) { ew = ew ?? exp; eh = eh ?? exp; }
-
-    const wantsEditor = q.get("editor") === "1" || w != null || h != null || ew != null || eh != null;
-    return { w, h, ew, eh, wantsEditor };
+    const wantsEditor = q.get("editor") === "1" || cw != null || ch != null || tile != null || ew != null || eh != null;
+    return { cw, ch, tile, ew, eh, wantsEditor };
   }
 
   // ============================================================
   //  Wire up events
   // ============================================================
+  function welcomeGrid() {
+    const sel = document.querySelector(".preset.selected");
+    const tile = sel ? parseInt(sel.dataset.tile, 10) : DEFAULT_TILE;
+    const size = parseInt($("canvasSize").value, 10) || DEFAULT_CANVAS;
+    return gridFor(size, size, tile);
+  }
+  function updateWelcomeHint() {
+    const g = welcomeGrid();
+    $("welcomeHint").textContent = `That gives you a ${g.w} × ${g.h} grid of tiles to color.`;
+  }
+
   function bind() {
-    // welcome presets
     document.querySelectorAll(".preset").forEach(p => {
       p.addEventListener("click", () => {
         document.querySelectorAll(".preset").forEach(x => x.classList.remove("selected"));
         p.classList.add("selected");
-        $("customW").value = p.dataset.w;
-        $("customH").value = p.dataset.h;
+        updateWelcomeHint();
       });
     });
+    $("canvasSize").addEventListener("input", updateWelcomeHint);
     $("startBtn").addEventListener("click", () => {
-      startEditor(parseInt($("customW").value, 10) || 32, parseInt($("customH").value, 10) || 32);
+      const sel = document.querySelector(".preset.selected");
+      const tile = sel ? parseInt(sel.dataset.tile, 10) : DEFAULT_TILE;
+      const size = parseInt($("canvasSize").value, 10) || DEFAULT_CANVAS;
+      startEditor(size, size, { tile });
     });
 
-    // canvas pointer
     canvas.addEventListener("pointerdown", (e) => { canvas.setPointerCapture(e.pointerId); onDown(e); });
     canvas.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
 
-    // tools
-    document.querySelectorAll(".tool[data-tool]").forEach(b =>
-      b.addEventListener("click", () => selectTool(b.dataset.tool)));
+    document.querySelectorAll(".tool[data-tool]").forEach(b => b.addEventListener("click", () => selectTool(b.dataset.tool)));
+    document.querySelectorAll(".tool[data-act]").forEach(b => b.addEventListener("click", () => {
+      const a = b.dataset.act;
+      if (a === "flipH") flipH();
+      else if (a === "flipV") flipV();
+      else if (a === "rotateL") rotate("L");
+      else if (a === "rotateR") rotate("R");
+      else if (a === "clear") { if (confirm("Clear the whole drawing?")) clearAll(); }
+    }));
 
-    // transforms
-    document.querySelectorAll(".tool[data-act]").forEach(b =>
-      b.addEventListener("click", () => {
-        const a = b.dataset.act;
-        if (a === "flipH") flipH();
-        else if (a === "flipV") flipV();
-        else if (a === "rotateL") rotate("L");
-        else if (a === "rotateR") rotate("R");
-        else if (a === "clear") { if (confirm("Clear the whole drawing?")) clearAll(); }
-      }));
-
-    // top bar
     $("undoBtn").addEventListener("click", undo);
     $("redoBtn").addEventListener("click", redo);
-    document.querySelectorAll(".resBtn").forEach(b =>
-      b.addEventListener("click", () => setResolution(parseInt(b.dataset.res, 10))));
+    document.querySelectorAll(".tileBtn").forEach(b => b.addEventListener("click", () => setTile(parseInt(b.dataset.tile, 10))));
     $("gridBtn").addEventListener("click", () => {
       state.showGrid = !state.showGrid;
       $("gridBtn").classList.toggle("active", state.showGrid);
       render();
     });
     $("exportBtn").addEventListener("click", openExport);
-    $("newBtn").addEventListener("click", () => {
-      if (confirm("Start a new drawing? Your current one will be cleared.")) goToWelcome();
-    });
+    $("newBtn").addEventListener("click", () => { if (confirm("Start a new drawing? Your current one will be cleared.")) goToWelcome(); });
 
-    // colors
-    colorInput.addEventListener("input", () => {
-      selectColor(colorInput.value);
-      if (state.tool === "eraser") selectTool("pencil");
-    });
+    colorInput.addEventListener("input", () => { selectColor(colorInput.value); if (state.tool === "eraser") selectTool("pencil"); });
 
-    // export modal
     $("cancelExport").addEventListener("click", closeExport);
     $("downloadBtn").addEventListener("click", doDownload);
     $("exportModal").addEventListener("click", (e) => { if (e.target.id === "exportModal") closeExport(); });
-    document.querySelectorAll(".scaleBtn").forEach(b =>
-      b.addEventListener("click", () => {
-        const s = parseInt(b.dataset.scale, 10);
-        const ew = state.w * s, eh = state.h * s;
-        $("exportW").value = ew; $("exportH").value = eh;
-      }));
-    // lock aspect ratio while typing export size
+    document.querySelectorAll(".scaleBtn").forEach(b => b.addEventListener("click", () => {
+      const s = parseInt(b.dataset.scale, 10);
+      $("exportW").value = state.canvasW * s;
+      $("exportH").value = state.canvasH * s;
+    }));
     const baseRatio = () => state.w / state.h;
     $("exportW").addEventListener("input", () => {
       if (!$("lockAspect").checked) return;
@@ -631,7 +582,6 @@
       if (Number.isFinite(v)) $("exportW").value = Math.round(v * baseRatio());
     });
 
-    // keyboard shortcuts (handy for older kids / parents)
     window.addEventListener("keydown", (e) => {
       if (editor.classList.contains("hidden")) return;
       if (e.target.tagName === "INPUT") return;
@@ -641,7 +591,6 @@
       if (map[e.key.toLowerCase()]) selectTool(map[e.key.toLowerCase()]);
     });
 
-    // re-fit the on-screen pixel size when the window resizes
     window.addEventListener("resize", () => {
       if (editor.classList.contains("hidden")) return;
       state.pixelSize = fitPixelSize();
@@ -656,10 +605,11 @@
     buildPalette();
     bind();
     selectColor(state.color);
+    updateWelcomeHint();
 
     const q = readQuery();
     if (q.wantsEditor) {
-      startEditor(q.w ?? 32, q.h ?? 32, { exportW: q.ew, exportH: q.eh });
+      startEditor(q.cw ?? DEFAULT_CANVAS, q.ch ?? DEFAULT_CANVAS, { tile: q.tile, exportW: q.ew, exportH: q.eh });
     }
   }
 
