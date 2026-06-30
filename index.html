@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" />
+  <script src="class-codes.js"></script>
   <style>
     :root {
       --brand:#01aefd; --brand-dark:#0294d8; --brand-ink:#0a6299; --brand-tint:#e7f7ff;
@@ -21,9 +22,49 @@
         radial-gradient(1000px 520px at 50% -8%, rgba(1,174,253,.16), transparent 70%),
         var(--bg);
     }
-    .wrap { max-width:880px; margin:0 auto; padding:64px 22px 80px; }
-    .logo-img { height:42px; width:auto; display:block; margin-bottom:20px; }
-    h1 { font-size:clamp(30px,5vw,42px); font-weight:700; letter-spacing:-.02em; margin:0 0 8px; }
+    .hidden { display:none !important; }
+
+    /* ---------- Code gate ---------- */
+    .gate { min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .gate-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:20px;
+      box-shadow:0 4px 16px rgba(31,42,55,.08), 0 1px 3px rgba(31,42,55,.06);
+      padding:34px 36px 32px; max-width:400px; width:100%; text-align:center;
+    }
+    .gate-card .logo-img { height:40px; width:auto; margin:0 auto 18px; display:block; }
+    .gate-card h1 { font-size:26px; font-weight:700; margin:0 0 6px; }
+    .gate-sub { color:var(--muted); font-size:15px; margin:0 0 22px; }
+    .code-input {
+      font-family:"Rubik",system-ui,sans-serif; text-align:center; text-transform:uppercase;
+      font-size:34px; font-weight:700; letter-spacing:14px; padding:14px 0 14px 14px;
+      width:100%; border:2px solid var(--border); border-radius:14px; color:var(--ink);
+      background:var(--surface); caret-color:var(--brand);
+    }
+    .code-input:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 4px rgba(1,174,253,.15); }
+    .code-input::placeholder { color:#cdd6e0; letter-spacing:14px; }
+    .gate-btn {
+      font-family:"Rubik",system-ui,sans-serif; font-size:16px; font-weight:600; color:#fff;
+      background:var(--brand); border:none; border-radius:12px; padding:13px 22px; width:100%;
+      margin-top:16px; cursor:pointer; transition:background .12s;
+    }
+    .gate-btn:hover { background:var(--brand-dark); }
+    .gate-msg { min-height:20px; margin:14px 0 0; font-size:14px; font-weight:600; color:#e23b4e; }
+    .gate-hint { color:var(--muted); font-size:13px; margin:18px 0 0; }
+    .shake { animation:shake .35s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
+
+    /* ---------- Tools hub ---------- */
+    .wrap { max-width:880px; margin:0 auto; padding:48px 22px 80px; }
+    .topline { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+    .logo-img { height:42px; width:auto; display:block; }
+    .classchip { display:inline-flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); }
+    .lockbtn {
+      font-family:"Rubik",system-ui,sans-serif; font-size:13px; font-weight:600; color:var(--brand-ink);
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      padding:7px 12px; cursor:pointer;
+    }
+    .lockbtn:hover { background:var(--brand-tint); border-color:var(--brand); }
+    h2.title { font-size:clamp(28px,5vw,40px); font-weight:700; letter-spacing:-.02em; margin:8px 0 8px; }
     .sub { color:var(--muted); font-size:17px; margin:0 0 36px; max-width:560px; line-height:1.5; }
     .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; }
     a.card {
@@ -34,29 +75,48 @@
     }
     a.card:hover { border-color:var(--brand); transform:translateY(-3px); box-shadow:0 12px 30px rgba(1,174,253,.14); }
     a.card .ico { width:44px; height:44px; border-radius:11px; display:grid; place-items:center; font-size:23px; background:var(--brand-tint); margin-bottom:6px; }
-    a.card h2 { margin:0; font-size:21px; font-weight:600; }
+    a.card h3 { margin:0; font-size:21px; font-weight:600; }
     a.card span { color:var(--muted); font-size:14px; line-height:1.5; }
     a.card .go { margin-top:6px; color:var(--brand-ink); font-weight:600; font-size:14px; }
     footer { color:var(--muted); font-size:13px; margin-top:44px; }
-    footer a { color:var(--brand-ink); text-decoration:none; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <img class="logo-img" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" />
-    <h1>Creative Tools</h1>
-    <p class="sub">A small suite of browser-based tools and coding projects — make pixel art, build games, and ship them straight from your browser.</p>
+
+  <!-- ===================== CODE GATE ===================== -->
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <img class="logo-img" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" />
+      <h1>Class Access</h1>
+      <p class="gate-sub">Enter your 4-letter class code to start.</p>
+      <input id="codeInput" class="code-input" maxlength="4" placeholder="••••"
+             autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"
+             aria-label="Class code" />
+      <button id="codeGo" class="gate-btn">Enter →</button>
+      <p id="codeMsg" class="gate-msg"></p>
+      <p class="gate-hint">Ask your teacher for today's code.</p>
+    </div>
+  </div>
+
+  <!-- ===================== TOOLS HUB (revealed after sign-in) ===================== -->
+  <div id="hub" class="wrap hidden">
+    <div class="topline">
+      <img class="logo-img" src="https://s3.us-west-1.amazonaws.com/utg.pictures.videos/UTGWeb/utglogoh.svg" alt="UTG Academy" />
+      <span class="classchip"><span id="classLabel"></span><button id="lockBtn" class="lockbtn">🔒 Lock</button></span>
+    </div>
+    <h2 class="title">Creative Tools</h2>
+    <p class="sub">Pick a tool to start making.</p>
 
     <div class="cards">
-      <a class="card" href="./pixel-art-maker/">
+      <a class="card" data-tool-card="pixel-art" href="./pixel-art-maker/">
         <div class="ico">🎨</div>
-        <h2>Pixel Art Maker</h2>
+        <h3>Pixel Art Maker</h3>
         <span>A focused pixel editor — draw, fill, transform, and export game-ready sprites and PNGs.</span>
         <div class="go">Open tool →</div>
       </a>
-      <a class="card" href="./camp-coding-projects/">
+      <a class="card" data-tool-card="camp" href="./camp-coding-projects/">
         <div class="ico">🕹️</div>
-        <h2>Camp Coding Projects</h2>
+        <h3>Camp Coding Projects</h3>
         <span>21 step-by-step Python coding projects — build a real, playable game one line at a time.</span>
         <div class="go">Browse projects →</div>
       </a>
@@ -64,5 +124,69 @@
 
     <footer>&copy; 2026 UTG Academy</footer>
   </div>
+
+  <script>
+    (function () {
+      var KEY = "utg_class_code";
+      var $ = function (id) { return document.getElementById(id); };
+      var norm = function (s) { return (s || "").trim().toUpperCase(); };
+      function find(code) {
+        var c = norm(code), list = window.CLASS_CODES || [];
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].enabled && norm(list[i].code) === c) return list[i];
+        }
+        return null;
+      }
+      function reveal(entry) {
+        $("gate").classList.add("hidden");
+        $("hub").classList.remove("hidden");
+        var tools = entry.tools;
+        document.querySelectorAll("[data-tool-card]").forEach(function (card) {
+          var id = card.getAttribute("data-tool-card");
+          var show = tools === "all" || (Array.isArray(tools) && tools.indexOf(id) >= 0);
+          card.style.display = show ? "" : "none";
+        });
+        $("classLabel").textContent = entry.label ? (entry.label + " · ") : "";
+      }
+      function showGate(msg) {
+        $("hub").classList.add("hidden");
+        $("gate").classList.remove("hidden");
+        $("codeMsg").textContent = msg || "";
+        $("codeInput").value = "";
+        $("codeInput").focus();
+      }
+      function submit() {
+        var entry = find($("codeInput").value);
+        if (entry) {
+          localStorage.setItem(KEY, norm($("codeInput").value));
+          $("codeMsg").textContent = "";
+          reveal(entry);
+        } else {
+          $("codeMsg").textContent = "That code isn't active right now.";
+          var card = document.querySelector(".gate-card");
+          card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+          $("codeInput").select();
+        }
+      }
+      $("codeInput").addEventListener("input", function () {
+        this.value = this.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+        if (this.value.length === 4) submit();
+      });
+      $("codeInput").addEventListener("keydown", function (e) { if (e.key === "Enter") submit(); });
+      $("codeGo").addEventListener("click", submit);
+      $("lockBtn").addEventListener("click", function () { localStorage.removeItem(KEY); showGate(""); });
+
+      // already signed in (and the code is still active)?
+      var saved = localStorage.getItem(KEY);
+      var entry = find(saved);
+      if (entry) {
+        reveal(entry);
+      } else {
+        if (saved) localStorage.removeItem(KEY);
+        var locked = new URLSearchParams(location.search).get("locked");
+        showGate(locked ? "Your class code isn't active. Enter today's code." : "");
+      }
+    })();
+  </script>
 </body>
 </html>
