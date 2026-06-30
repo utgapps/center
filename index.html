@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" />
-  <script src="class-codes.js"></script>
+  <!-- load the codes fresh every time (no cache) so a code/permission change locks students out on their next page load -->
+  <script>document.write('<script src="class-codes.js?t=' + Date.now() + '"><\/script>');</script>
   <style>
     :root {
       --brand:#01aefd; --brand-dark:#0294d8; --brand-ink:#0a6299; --brand-tint:#e7f7ff;

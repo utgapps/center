@@ -1247,8 +1247,9 @@ NOCOPY = ('<script>["copy","cut","paste","contextmenu","selectstart","dragstart"
 
 # Class-code access guard: sends kids back to the home gate unless their saved
 # class code is active and unlocks the "camp" tools. Runs first thing in <head>.
-GUARD = ('<script>window.UTG_GUARD="../";window.UTG_TOOL="camp";</script>'
-         '<script src="../class-codes.js"></script><script src="../guard.js"></script>')
+GUARD = ('<script>window.UTG_GUARD="../";window.UTG_TOOL="camp";'
+         'document.write(\'<script src="../class-codes.js?t=\'+Date.now()+\'"><\\/script>\');'
+         '</script><script src="../guard.js"></script>')
 
 def index():
     cards = []
