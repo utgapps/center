@@ -1127,7 +1127,9 @@ CSS = """
     @media print { .sprite-link { background:transparent; border:none; color:#15202b; padding:0; }
                    .sprite-tip { display:none; } }
 
-    /* "Show me" button + animated how-to-add popup (steps 3 & 4 of the setup) */
+    /* "Show me" button + animated how-to-add popup (setup steps 3 & 4).
+       The mini editor reuses the workbook's own PixelPad sidebar styles
+       (.sidebar/.sb-head/.sb-item) so it matches the step screenshots. */
     .howbtn { display:inline-block; cursor:pointer; font-size:12px; font-weight:600; color:#01aefd;
               background:#e7f7ff; border:1px solid #b6e2fb; border-radius:7px; padding:1px 9px; margin-left:5px; }
     .howbtn:hover { background:#d3eefb; }
@@ -1136,68 +1138,69 @@ CSS = """
     #ahc:checked ~ .ah-modal.for-class { display:flex; }
     #ahr:checked ~ .ah-modal.for-room  { display:flex; }
     .ah-backdrop { position:absolute; inset:0; background:rgba(31,42,55,.5); cursor:pointer; }
-    .ah-card { position:relative; background:#fff; border-radius:16px; padding:20px 22px 18px; width:380px; max-width:100%;
+    .ah-card { position:relative; background:#fff; border-radius:16px; padding:20px 22px 18px; width:384px; max-width:100%;
                box-shadow:0 20px 60px rgba(31,42,55,.35); text-align:center; }
     .ah-x { position:absolute; top:8px; right:14px; font-size:24px; line-height:1; color:#8a97a6; cursor:pointer; }
     .ah-title { font-size:17px; font-weight:600; margin-bottom:14px; color:#1f2a37; }
     .ah-cap { font-size:13px; color:#516170; margin-top:13px; }
     .ah-cap b { color:#1f2a37; }
-    .ah-stage { position:relative; width:300px; height:170px; margin:0 auto; background:#f3f5f7;
-                border:1px solid #d6dbe2; border-radius:10px; overflow:hidden; }
-    .ah-side { position:absolute; left:0; top:0; width:128px; height:100%; background:#e7e9eb; border-right:1px solid #d2d6db; }
-    .ah-head { display:flex; align-items:center; justify-content:space-between; padding:7px 8px 4px 11px;
-               font-size:11px; font-weight:700; letter-spacing:.4px; color:#7a828c; }
-    .ah-plus { width:16px; height:16px; border-radius:5px; background:#01aefd; color:#fff; font-size:13px;
-               line-height:16px; text-align:center; animation:ahPlus 7s infinite; }
-    .ah-list { padding:2px 0; }
-    .ah-item { padding:4px 11px; font-size:12px; color:#343a40; }
-    .ah-item:first-child { color:#5a6470; }
-    .ah-new { overflow:hidden; max-height:0; opacity:0; border-radius:4px; margin:0 4px; animation:ahNew 7s infinite; }
-    .ah-dialog { position:absolute; left:96px; top:42px; width:178px; background:#fff; border:1px solid #c8cfd8;
-                 border-radius:8px; box-shadow:0 8px 22px rgba(0,0,0,.18); padding:9px 10px; opacity:0;
-                 transform:scale(.92); animation:ahDialog 7s infinite; }
-    .ah-dtitle { font-size:11px; font-weight:600; color:#6b7787; margin-bottom:6px; text-align:left; }
-    .ah-field { display:flex; align-items:center; height:22px; border:1px solid #c8cfd8; border-radius:5px; padding:0 6px; background:#fbfcfd; }
+    .ah-stage { position:relative; width:300px; height:172px; margin:0 auto; background:#f3f5f7;
+                border:1px solid #c4ccd6; border-radius:8px; overflow:hidden; box-shadow:0 3px 12px rgba(0,0,0,.12); }
+    .ah-stage .sidebar { position:absolute; left:0; top:0; width:140px; height:100%; padding:6px 0; }
+    .ah-stage .sb-head { display:flex; align-items:center; justify-content:space-between; }
+    .ah-plus { display:inline-block; width:15px; height:15px; border-radius:50%; background:#7a828c; position:relative;
+               flex:none; animation:ahPlus 7s infinite; }
+    .ah-plus::before { content:""; position:absolute; left:4px; top:6.6px; width:7px; height:1.8px; background:#e7e9eb; border-radius:1px; }
+    .ah-plus::after  { content:""; position:absolute; left:6.6px; top:4px; width:1.8px; height:7px; background:#e7e9eb; border-radius:1px; }
+    .ah-new { overflow:hidden; max-height:0; opacity:0; background:#007bff; color:#fff; font-weight:600; animation:ahNew 7s infinite; }
+    .ah-dialog { position:absolute; left:78px; top:30px; width:194px; background:#fff; border:1px solid #d0d6dd; border-radius:6px;
+                 box-shadow:0 12px 28px rgba(0,0,0,.28); overflow:hidden; opacity:0; transform:scale(.95); animation:ahDialog 7s infinite; }
+    .ah-dmsg { font-size:11.5px; color:#1f2a37; padding:11px 12px 9px; text-align:left; }
+    .ah-field { display:flex; align-items:center; height:24px; margin:0 12px; border:1px solid #c8cfd8; border-radius:4px; padding:0 7px; background:#fff; }
     .ah-typed { display:inline-block; overflow:hidden; white-space:nowrap; max-width:0; font-size:12px; color:#1f2a37; animation:ahType 7s infinite; }
     .ah-caret { width:1px; height:13px; background:#1f2a37; margin-left:1px; animation:ahBlink .7s steps(1) infinite; }
-    .ah-okrow { text-align:right; margin-top:8px; }
-    .ah-ok { display:inline-block; background:#01aefd; color:#fff; font-size:11px; font-weight:600; padding:3px 12px; border-radius:5px; animation:ahOk 7s infinite; }
-    .ah-cursor { position:absolute; left:0; top:0; width:15px; height:21px; background:#1f2a37; z-index:5;
+    .ah-okrow { display:flex; justify-content:flex-end; gap:6px; padding:9px 12px; background:#f4f6f8; margin-top:9px; }
+    .ah-cancel { font-size:11px; color:#5a6470; background:#e6e9ed; border-radius:4px; padding:3px 11px; }
+    .ah-ok { font-size:11px; color:#fff; background:#007bff; border-radius:4px; padding:3px 12px; animation:ahOk 7s infinite; }
+    .ah-cursor { position:absolute; left:0; top:0; width:15px; height:21px; background:#1f2a37; z-index:6;
                  clip-path:polygon(0 0, 0 72%, 22% 57%, 38% 94%, 52% 86%, 36% 52%, 64% 52%);
                  filter:drop-shadow(0 0 1px #fff); animation:ahCursor 7s infinite; }
     @keyframes ahCursor {
-      0%{transform:translate(24px,150px) scale(1)} 16%{transform:translate(108px,12px) scale(1)}
-      19%{transform:translate(108px,12px) scale(.8)} 23%{transform:translate(108px,12px) scale(1)}
-      33%{transform:translate(150px,84px) scale(1)} 60%{transform:translate(150px,84px) scale(1)}
-      70%{transform:translate(238px,108px) scale(1)} 73%{transform:translate(238px,108px) scale(.8)}
-      77%{transform:translate(238px,108px) scale(1)} 90%{transform:translate(238px,108px) scale(1)}
-      100%{transform:translate(24px,150px) scale(1)} }
-    @keyframes ahPlus { 0%,18%,23%,100%{transform:scale(1);box-shadow:none} 20%{transform:scale(.78);box-shadow:0 0 0 4px rgba(1,174,253,.25)} }
-    @keyframes ahDialog { 0%,17%{opacity:0;transform:scale(.92)} 23%,77%{opacity:1;transform:scale(1)} 82%,100%{opacity:0;transform:scale(.92)} }
-    @keyframes ahType { 0%,30%{max-width:0} 56%,100%{max-width:96px} }
+      0%{transform:translate(20px,150px) scale(1)} 16%{transform:translate(122px,12px) scale(1)}
+      19%{transform:translate(122px,12px) scale(.8)} 23%{transform:translate(122px,12px) scale(1)}
+      33%{transform:translate(150px,76px) scale(1)} 60%{transform:translate(150px,76px) scale(1)}
+      70%{transform:translate(244px,102px) scale(1)} 73%{transform:translate(244px,102px) scale(.8)}
+      77%{transform:translate(244px,102px) scale(1)} 90%{transform:translate(244px,102px) scale(1)}
+      100%{transform:translate(20px,150px) scale(1)} }
+    @keyframes ahPlus { 0%,18%,23%,100%{box-shadow:none} 20%{box-shadow:0 0 0 4px rgba(0,123,255,.3)} }
+    @keyframes ahDialog { 0%,17%{opacity:0;transform:scale(.95)} 23%,77%{opacity:1;transform:scale(1)} 82%,100%{opacity:0;transform:scale(.95)} }
+    @keyframes ahType { 0%,30%{max-width:0} 56%,100%{max-width:100px} }
     @keyframes ahBlink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
-    @keyframes ahOk { 0%,71%,77%,100%{transform:scale(1);filter:none} 74%{transform:scale(.86);filter:brightness(.88)} }
-    @keyframes ahNew { 0%,78%{opacity:0;max-height:0;background:transparent} 84%{opacity:1;max-height:22px;background:#bfe9ff} 100%{opacity:1;max-height:22px;background:transparent} }
+    @keyframes ahOk { 0%,71%,77%,100%{filter:none} 74%{filter:brightness(.85)} }
+    @keyframes ahNew { 0%,78%{opacity:0;max-height:0} 84%,100%{opacity:1;max-height:24px} }
     @media print { .howbtn, .ah-modal { display:none !important; } }
 """
 
 # Animated "how to add a Class/Room" popup (shown from setup items 3 & 4).
-def add_help_modal(tid, modal_cls, word, header, existing, typed):
-    items = "".join('<div class="ah-item">%s</div>' % html.escape(e) for e in existing)
+# The mini editor reuses PixelPad's sidebar look; the dialog shows PixelPad's
+# real prompt text (Classes: "Please enter script name."; Rooms: "Please enter
+# room name.").
+def add_help_modal(tid, modal_cls, word, header, prompt_msg, existing, typed):
+    items = "".join('<div class="sb-item">%s</div>' % html.escape(e) for e in existing)
     return ('<input type="checkbox" id="%s" class="ah-toggle">'
             '<div class="ah-modal %s"><label for="%s" class="ah-backdrop"></label>'
             '<div class="ah-card"><label for="%s" class="ah-x">&times;</label>'
             '<div class="ah-title">How to add a %s</div>'
             '<div class="ah-stage">'
-            '<div class="ah-side"><div class="ah-head">%s<span class="ah-plus">+</span></div>'
-            '<div class="ah-list">%s<div class="ah-item ah-new">%s</div></div></div>'
-            '<div class="ah-dialog"><div class="ah-dtitle">New %s</div>'
+            '<div class="sidebar"><div class="sb-head">%s<span class="ah-plus"></span></div>'
+            '%s<div class="sb-item ah-new">%s</div></div>'
+            '<div class="ah-dialog"><div class="ah-dmsg">%s</div>'
             '<div class="ah-field"><span class="ah-typed">%s</span><span class="ah-caret"></span></div>'
-            '<div class="ah-okrow"><span class="ah-ok">OK</span></div></div>'
+            '<div class="ah-okrow"><span class="ah-cancel">Cancel</span><span class="ah-ok">OK</span></div></div>'
             '<div class="ah-cursor"></div></div>'
-            '<div class="ah-cap">Move to <b>+</b> next to <b>%s</b>, type the name, then press <b>OK</b>.</div>'
+            '<div class="ah-cap">Click the <b>+</b> by <b>%s</b>, type the name, then press <b>OK</b>.</div>'
             '</div></div>'
-            % (tid, modal_cls, tid, tid, word, header, items, html.escape(typed), word, html.escape(typed), header))
+            % (tid, modal_cls, tid, tid, word, header, items, html.escape(typed), prompt_msg, html.escape(typed), header))
 
 def setup_block(game):
     dims = sprite_dims(game)
@@ -1227,8 +1230,8 @@ def setup_block(game):
             'Now follow the steps. Type only the <span class="g">green</span> lines each time.'
             '%s%s</div>'
             % (sprites, classes, rooms,
-               add_help_modal("ahc", "for-class", "Class", "CLASSES", ["Game"], ex_class),
-               add_help_modal("ahr", "for-room", "Room", "ROOMS", [], ex_room)))
+               add_help_modal("ahc", "for-class", "Class", "Classes", "Please enter script name.", ["Game"], ex_class),
+               add_help_modal("ahr", "for-room", "Room", "Rooms", "Please enter room name.", [], ex_room)))
 
 def render(game):
     pages, cum = [], {}
