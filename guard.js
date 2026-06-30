@@ -2,26 +2,34 @@
    A page must, BEFORE loading this file, set:
        window.UTG_GUARD = "../";          // path back to the home page
        window.UTG_TOOL  = "pixel-art";    // which tool this page is
-   and load  class-codes.js  first. If the saved class code is missing,
-   disabled, or doesn't include this tool, the kid is sent to the home
-   gate so the resources stay locked outside class.
+       window.UTG_PLAY  = "flappy";       // (final game pages only) the game slug
+   and load  class-codes.js  first.
 
-   It also records per-code permissions as classes on <html>:
-       utg-can-print  — the code's  print: true  (allowed to Print to PDF). */
+   - If the saved class code is missing/disabled or doesn't include this tool,
+     the kid is sent to the home gate so resources stay locked outside class.
+   - On a final game page (UTG_PLAY set), if the code may not PLAY that game,
+     the kid is sent to that game's guide instead.
+   - Records permissions for the page: html.utg-can-print (print:true), and
+     window.UTG.canPlay(slug) for the hub to show/hide Play buttons. */
 (function () {
-  function deny() { location.replace((window.UTG_GUARD || "../") + "?locked=1"); }
+  function deny(to) { location.replace(to || ((window.UTG_GUARD || "../") + "?locked=1")); }
+  var entry = null;
   try {
     var saved = (localStorage.getItem("utg_class_code") || "").trim().toUpperCase();
     var list = window.CLASS_CODES || [];
-    var entry = null;
     for (var i = 0; i < list.length; i++) {
       if (list[i].enabled && String(list[i].code).trim().toUpperCase() === saved) { entry = list[i]; break; }
     }
-    var ok = !!entry && (entry.tools === "all" ||
-             (entry.tools && entry.tools.indexOf(window.UTG_TOOL) >= 0));
+  } catch (e) {}
+  function allow(perm, key) {
+    return perm === true || perm === "all" || (!!perm && perm.indexOf && perm.indexOf(key) >= 0);
+  }
+  window.UTG = { entry: entry, canPlay: function (slug) { return !!entry && allow(entry.play, slug); } };
+
+  if (window.UTG_TOOL) {
+    var ok = !!entry && (entry.tools === "all" || (entry.tools && entry.tools.indexOf(window.UTG_TOOL) >= 0));
     if (!ok) { deny(); return; }
-    if (entry.print) { document.documentElement.classList.add("utg-can-print"); }
-  } catch (e) {
-    deny();
+    if (entry.print) document.documentElement.classList.add("utg-can-print");
+    if (window.UTG_PLAY && !window.UTG.canPlay(window.UTG_PLAY)) { deny(window.UTG_PLAY + "-workbook.html"); return; }
   }
 })();

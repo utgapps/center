@@ -1045,7 +1045,7 @@ def assemble(game):
             'if(window.ppApp||n>80){window.dispatchEvent(new Event("resize"));clearInterval(iv);}},200);})();'
             '</script></body></html>')
     with open(game["slug"] + "-final.html", "w", encoding="utf-8") as f:
-        f.write(tmpl % (GUARD, game["title"], CDN, json.dumps(cfg)))
+        f.write(tmpl % (guard_html(game["slug"]), game["title"], CDN, json.dumps(cfg)))
 
 def esc(s):
     return html.escape(s).replace(" ", "&nbsp;")
@@ -1263,7 +1263,7 @@ def render(game):
            '<meta name="viewport" content="width=device-width, initial-scale=1">'
            '<title>%s - Workbook</title>%s<style>%s</style></head><body>'
            '<button class="printbtn" onclick="window.print()">&#128424;&nbsp; Print to PDF</button>'
-           '%s%s%s</body></html>' % (GUARD, html.escape(game["title"]), FONT_LINK, CSS, intro, "".join(pages), NOCOPY))
+           '%s%s%s</body></html>' % (guard_html(), html.escape(game["title"]), FONT_LINK, CSS, intro, "".join(pages), NOCOPY))
     with open(game["slug"] + "-workbook.html", "w", encoding="utf-8") as f:
         f.write(doc)
 
@@ -1305,7 +1305,8 @@ HUB_CSS = """
               padding:9px 6px; font-size:14px; border:1px solid; }
     .wb { color:#fff; background:var(--brand); border-color:var(--brand); }
     .wb:hover { background:var(--brand-dark); }
-    .play { color:var(--brand-ink); background:var(--surface); border-color:var(--border); }
+    .play { color:var(--brand-ink); background:var(--surface); border-color:var(--border); display:none; }
+    .play.ok { display:block; }   /* shown only when the class code may play this game */
     .play:hover { background:var(--brand-tint); border-color:var(--brand); }
     footer { color:var(--muted); font-size:13px; margin-top:36px; }
     footer a { color:var(--brand-ink); text-decoration:none; }
@@ -1324,11 +1325,16 @@ NOCOPY = ('<script>["copy","cut","paste","contextmenu","selectstart","dragstart"
           '.forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},'
           '{capture:true});});</script>')
 
-# Class-code access guard: sends kids back to the home gate unless their saved
-# class code is active and unlocks the "camp" tools. Runs first thing in <head>.
-GUARD = ('<script>window.UTG_GUARD="../";window.UTG_TOOL="camp";'
-         'document.write(\'<script src="../class-codes.js?t=\'+Date.now()+\'"><\\/script>\');'
-         '</script><script src="../guard.js"></script>')
+# Class-code access guard (runs first thing in <head>): sends kids back to the
+# home gate unless their saved code is active and unlocks the "camp" tools. On a
+# final game page, pass the slug so guard.js can enforce the per-game PLAY
+# permission. class-codes.js is loaded uncached so code changes apply on the
+# next page load.
+def guard_html(play=None):
+    play_js = ('window.UTG_PLAY="%s";' % play) if play else ''
+    return ('<script>window.UTG_GUARD="../";window.UTG_TOOL="camp";%s'
+            'document.write(\'<script src="../class-codes.js?t=\'+Date.now()+\'"><\\/script>\');'
+            '</script><script src="../guard.js"></script>' % play_js)
 
 def index():
     cards = []
@@ -1338,8 +1344,8 @@ def index():
             '<div class="card"><div class="emoji">%s</div>'
             '<div class="title">%s</div><div class="meta">%d steps</div>'
             '<div class="btns"><a class="wb" href="%s-workbook.html">Guide</a>'
-            '<a class="play" href="%s-final.html" target="_blank">Play</a></div></div>'
-            % (emoji, html.escape(g["title"]), len(g["steps"]), g["slug"], g["slug"]))
+            '<a class="play" data-game="%s" href="%s-final.html" target="_blank">Play</a></div></div>'
+            % (emoji, html.escape(g["title"]), len(g["steps"]), g["slug"], g["slug"], g["slug"]))
     doc = ('<!DOCTYPE html><html lang="en"><head>%s<meta charset="utf-8">'
            '<meta name="viewport" content="width=device-width, initial-scale=1">'
            '<title>Camp Coding Projects · UTG Academy</title>%s<style>%s</style></head><body>'
@@ -1350,8 +1356,10 @@ def index():
            '<div class="banner">Every project is a hands-on Python coding challenge: type each line yourself, '
            'run your code, and watch your game come to life. Start with any project below.</div>'
            '<div class="grid">%s</div>'
-           '<footer>&copy; 2026 UTG Academy</footer>'
-           '</div></body></html>' % (GUARD, FONT_LINK, HUB_CSS, LOGO_URL, "".join(cards)))
+           '<footer>&copy; 2026 UTG Academy</footer></div>'
+           '<script>(function(){var u=window.UTG;document.querySelectorAll(".play[data-game]").forEach('
+           'function(a){if(u&&u.canPlay(a.getAttribute("data-game")))a.classList.add("ok");});})();</script>'
+           '</body></html>' % (guard_html(), FONT_LINK, HUB_CSS, LOGO_URL, "".join(cards)))
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(doc)
 

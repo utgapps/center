@@ -12,6 +12,13 @@
                "pixel-art"  and/or  "camp"
      print   : true = may use "Print to PDF" on the coding workbooks;
                leave it out (or false) to block printing for that code.
+     play    : who may PLAY the finished games (the "Play" buttons).
+               "all", a list of game slugs, or [] / leave out for none.
+               Game slugs:
+                 catch whack flappy subway geo crossy pong brick doodle
+                 shooter heli slice dodge stack fishing rhythm lander
+                 platformer cookie pacman drift
+               e.g.  play: ["flappy","drift"]  lets them play only those.
 
    This is a simple gate, NOT real security — the codes are public
    in this file. It just keeps kids out of the resources outside class.
@@ -19,6 +26,6 @@
    can take a little while to take effect at home.)
    ============================================================ */
 window.CLASS_CODES = [
-  { code: "QWER", label: "Students (all resources)", enabled: true, tools: "all", print: false },
-  { code: "ASDF", label: "Teacher (can print PDFs)", enabled: true, tools: "all", print: true },
+  { code: "QWER", label: "Students",  enabled: true, tools: "all", print: false, play: [] },
+  { code: "ASDF", label: "Teacher",   enabled: true, tools: "all", print: true,  play: "all" },
 ];
