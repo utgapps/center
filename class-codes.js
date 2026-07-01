@@ -26,6 +26,6 @@
    can take a little while to take effect at home.)
    ============================================================ */
 window.CLASS_CODES = [
-  { code: "QWER", label: "Students",  enabled: true, tools: "all", print: false, play: [] },
+  { code: "QWER", label: "Students",  enabled: false, tools: "all", print: false, play: [] },
   { code: "ASDF", label: "Teacher",   enabled: true, tools: "all", print: true,  play: "all" },
 ];
