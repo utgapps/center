@@ -3,3 +3,7 @@
 
 # Archived projects kept locally (to be reorganized later)
 /archive/
+
+# Python
+__pycache__/
+*.pyc
